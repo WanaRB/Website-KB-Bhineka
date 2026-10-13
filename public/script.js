@@ -43,6 +43,8 @@ const PLACEHOLDER = 'img/placeholder.svg';
     showLoadError('galeri-grid', msg);
     showLoadError('guru-grid', msg);
     showLoadError('testimoni-list', msg);
+    var phoneLinkEl = document.getElementById('phone-link');
+    if (phoneLinkEl) phoneLinkEl.textContent = '📞 Nomor belum tersedia';
   }
 
   // ---------- Ambil data sekolah dari Supabase ----------
@@ -268,6 +270,9 @@ const PLACEHOLDER = 'img/placeholder.svg';
             var waUrl = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(waMsg);
             setAttr('wa-cta', 'href', waUrl);
           }
+        } else {
+          var phoneLinkEl = document.getElementById('phone-link');
+          if (phoneLinkEl) phoneLinkEl.textContent = '📞 Nomor belum diatur admin';
         }
       });
   }

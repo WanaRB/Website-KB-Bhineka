@@ -200,6 +200,13 @@ const PLACEHOLDER = 'img/placeholder.svg';
         showLoadError('guru-grid', 'Data guru & staff belum bisa ditampilkan saat ini. Silakan hubungi kami langsung lewat WhatsApp.');
       });
   }
+  function normalizePhone(raw) {
+  var digits = String(raw || '').replace(/\D/g, '');
+  if (digits.indexOf('0') === 0) {
+    digits = '62' + digits.slice(1);
+  }
+  return digits;
+}
 
   function formatPhoneDisplay(digits) {
     var local = digits.indexOf('62') === 0 ? '0' + digits.slice(2) : digits;
@@ -259,7 +266,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
         }
 
         if (map.no_telp) {
-          var digits = String(map.no_telp).replace(/\D/g, '');
+          var digits = normalizePhone(map.no_telp);
           if (digits) {
             var phoneLink = document.getElementById('phone-link');
             if (phoneLink) {

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#e0f2fe"/>
+  <g transform="translate(130,90)">
+    <rect x="0" y="0" width="140" height="100" rx="10" fill="#bae6fd" stroke="#7dd3fc" stroke-width="3"/>
+    <circle cx="35" cy="32" r="12" fill="#f0f9ff"/>
+    <path d="M10 85 L55 50 L85 72 L110 45 L130 85 Z" fill="#7dd3fc"/>
+  </g>
+  <text x="200" y="225" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="18" font-weight="700" fill="#0284c7" text-anchor="middle">Foto Belum Tersedia</text>
+</svg>

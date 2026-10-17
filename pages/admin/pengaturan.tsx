@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { createClient } from '../../lib/supabase/client';
 
-type InfoItem = { judul: string; isi: string };
+type InfoItem = { judul: string; isi: string; kategori: string };
 
 type Settings = {
   tagline: string;
@@ -11,8 +11,8 @@ type Settings = {
   tentang_teks: string;
   info_pendaftaran: InfoItem[];
   alamat: string;
-  no_telp: string;
   maps_koordinat: string;
+  no_telp: string;
   jam_operasional: string;
   cta_teks: string;
 };
@@ -24,11 +24,29 @@ const EMPTY: Settings = {
   tentang_teks: '',
   info_pendaftaran: [],
   alamat: '',
-  no_telp: '',
   maps_koordinat: '',
+  no_telp: '',
   jam_operasional: '',
   cta_teks: '',
 };
+
+const KATEGORI = [
+  { value: 'jadwal', label: 'Jadwal pendaftaran', judul: 'Nama kegiatan (cth: Pendaftaran dibuka)', isi: 'Tanggal (cth: 1 – 15 Juni)' },
+  { value: 'dokumen', label: 'Dokumen yang dibawa', judul: 'Jenis (cth: Dokumen)', isi: 'Isi (cth: Fotokopi Kartu Keluarga)' },
+  { value: 'kelompok', label: 'Usia dan kelompok', judul: 'Kelompok (cth: Kelompok A)', isi: 'Usia (cth: 3 – 4 tahun)' },
+  { value: 'catatan', label: 'Catatan', judul: 'Judul (boleh kosong)', isi: 'Isi catatan' },
+  { value: 'lainnya', label: 'Lainnya', judul: 'Judul (cth: Biaya)', isi: 'Isi (cth: Hubungi kami)' },
+];
+
+// Harus sama dengan inferKategori di public/script.js
+function inferKategori(judul: string): string {
+  const j = String(judul || '').toLowerCase();
+  if (/dokumen|pas\s*foto|berkas|persyaratan/.test(j)) return 'dokumen';
+  if (/usia|kelas|kelompok/.test(j)) return 'kelompok';
+  if (/jadwal|tanggal|pengumuman|wawancara|observasi|daftar ulang|registrasi/.test(j)) return 'jadwal';
+  if (/catatan|keterangan/.test(j)) return 'catatan';
+  return 'lainnya';
+}
 
 async function uploadFoto(file: File): Promise<string> {
   const supabase = createClient();
@@ -59,7 +77,16 @@ export default function PengaturanPage() {
       rows.forEach((r) => {
         if (r.key === 'info_pendaftaran') {
           try {
-            next.info_pendaftaran = JSON.parse(r.value || '[]');
+            const parsed = JSON.parse(r.value || '[]');
+            next.info_pendaftaran = Array.isArray(parsed)
+              ? parsed.map((it: any) => ({
+                  judul: it?.judul || '',
+                  isi: it?.isi || '',
+                  kategori: KATEGORI.some((k) => k.value === it?.kategori)
+                    ? it.kategori
+                    : inferKategori(it?.judul || ''),
+                }))
+              : [];
           } catch {
             next.info_pendaftaran = [];
           }
@@ -79,11 +106,14 @@ export default function PengaturanPage() {
   }
 
   function addInfoItem() {
-    setForm((f) => ({ ...f, info_pendaftaran: [...f.info_pendaftaran, { judul: '', isi: '' }] }));
+    setForm((f) => ({
+      ...f,
+      info_pendaftaran: [...f.info_pendaftaran, { judul: '', isi: '', kategori: 'dokumen' }],
+    }));
     setSaved(false);
   }
 
-  function updateInfoItem(index: number, field: 'judul' | 'isi', value: string) {
+  function updateInfoItem(index: number, field: 'judul' | 'isi' | 'kategori', value: string) {
     setForm((f) => {
       const next = [...f.info_pendaftaran];
       next[index] = { ...next[index], [field]: value };
@@ -219,25 +249,62 @@ export default function PengaturanPage() {
         />
 
         <label>Informasi pendaftaran</label>
-        {form.info_pendaftaran.map((item, i) => (
-          <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-            <input
-              placeholder="Judul (contoh: Usia murid)"
-              value={item.judul}
-              onChange={(e) => updateInfoItem(i, 'judul', e.target.value)}
-              style={{ flex: 1 }}
-            />
-            <input
-              placeholder="Isi (contoh: 2 - 4 tahun)"
-              value={item.isi}
-              onChange={(e) => updateInfoItem(i, 'isi', e.target.value)}
-              style={{ flex: 1 }}
-            />
-            <button type="button" className="btn-danger" onClick={() => removeInfoItem(i)}>
-              Hapus
-            </button>
-          </div>
-        ))}
+        <p style={{ fontSize: 13, color: '#64748b', margin: '-2px 0 10px' }}>
+          Pilih kategori tiap baris supaya tampil rapi di halaman orang tua. Jadwal: judul = nama kegiatan, isi = tanggal.
+          Dokumen: isi = nama dokumen. Usia dan kelompok: judul = &quot;Kelompok A&quot;, isi = usia.
+        </p>
+        {form.info_pendaftaran.map((item, i) => {
+          const kat = KATEGORI.find((k) => k.value === item.kategori) || KATEGORI[KATEGORI.length - 1];
+          return (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 8,
+                marginBottom: 10,
+                padding: 10,
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                background: '#fafbfc',
+              }}
+            >
+              <select
+                value={item.kategori}
+                onChange={(e) => updateInfoItem(i, 'kategori', e.target.value)}
+                style={{
+                  flex: '0 0 100%',
+                  padding: '10px 12px',
+                  border: '1px solid var(--border)',
+                  borderRadius: 8,
+                  fontSize: 15,
+                  background: '#fff',
+                }}
+              >
+                {KATEGORI.map((k) => (
+                  <option key={k.value} value={k.value}>
+                    {k.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                placeholder={kat.judul}
+                value={item.judul}
+                onChange={(e) => updateInfoItem(i, 'judul', e.target.value)}
+                style={{ flex: 1, minWidth: 140 }}
+              />
+              <input
+                placeholder={kat.isi}
+                value={item.isi}
+                onChange={(e) => updateInfoItem(i, 'isi', e.target.value)}
+                style={{ flex: 1, minWidth: 140 }}
+              />
+              <button type="button" className="btn-danger" onClick={() => removeInfoItem(i)}>
+                Hapus
+              </button>
+            </div>
+          );
+        })}
         <button type="button" className="btn-secondary" onClick={addInfoItem} style={{ marginBottom: 16 }}>
           + Tambah info
         </button>
@@ -252,9 +319,8 @@ export default function PengaturanPage() {
           onChange={(e) => update('maps_koordinat', e.target.value)}
           placeholder="contoh: -6.927555, 107.636087"
         />
-        <br /> <br />
-        <p style={{ fontSize: 13, color: '#3c4d71', marginTop: -8}}>
-          <span style={{ color: 'red' }}>Cara ambil titik lokasi maps :</span> Buka Google Maps, cari lokasi sekolah, tekan lama/klik kanan titik di peta sampai muncul koordinat, lalu salin dan tempel di sini.
+        <p style={{ fontSize: 13, color: '#64748b', marginTop: -8 }}>
+          Cara ambil: buka Google Maps di HP/laptop, cari lokasi sekolah, tekan lama/klik kanan titik di peta sampai muncul koordinat, lalu salin (copy) dan tempel di sini.
         </p>
 
         <label htmlFor="no_telp">Nomor WhatsApp / telepon</label>
@@ -262,10 +328,10 @@ export default function PengaturanPage() {
           id="no_telp"
           value={form.no_telp}
           onChange={(e) => update('no_telp', e.target.value)}
-          placeholder="contoh: 6281234567890 (kode negara, tanpa + atau spasi)"
+          placeholder="contoh: 081234567890 atau 6281234567890"
         />
 
-                <label htmlFor="jam_operasional">Jam operasional sekolah</label>
+        <label htmlFor="jam_operasional">Jam operasional sekolah</label>
         <input
           id="jam_operasional"
           value={form.jam_operasional}
@@ -273,12 +339,13 @@ export default function PengaturanPage() {
           placeholder="contoh: Senin – Jumat, 07.30 – 11.00"
         />
 
-        <label htmlFor="cta_teks">Teks ajakan daftar (CTA akhir)</label>
-        <input
+        <label htmlFor="cta_teks">Cara mendaftar (penjelasan singkat)</label>
+        <textarea
           id="cta_teks"
           value={form.cta_teks}
           onChange={(e) => update('cta_teks', e.target.value)}
-          placeholder="contoh: Tertarik menyekolahkan anak Anda di sini?"
+          rows={3}
+          placeholder="contoh: Daftar langsung ke sekolah, atau tanya-tanya dulu lewat WhatsApp."
         />
 
         {error && <p className="form-error">{error}</p>}

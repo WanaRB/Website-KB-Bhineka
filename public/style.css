@@ -169,19 +169,12 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 .testimoni-card p { margin: 0 0 8px; font-size: 16px; }
 .testimoni-card cite { font-style: normal; color: var(--ink-soft); font-size: 14px; }
 
-.info-grid { display: flex; flex-direction: column; gap: 12px; }
-.info-item { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.06); }
-.info-label { color: var(--ink-soft); font-size: 15px; }
-.info-value { font-size: 20px; font-weight: 700; color: var(--sky-700); }
-
 .alamat { font-size: 16px; }
 .maps-wrap { border-radius: var(--radius); overflow: hidden; margin: 12px 0; height: 200px; }
 .maps-wrap iframe { width: 100%; height: 100%; border: 0; }
 .phone-link { display: inline-flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; color: var(--sky-700); text-decoration: none; margin: 12px 0 4px; }
 .jam { color: var(--ink-soft); font-size: 15px; margin: 0; }
 
-.cta-final { text-align: center; padding: 40px 20px 48px; }
-.cta-final h2 { font-size: 20px; margin: 0 0 20px; color: var(--sky-700); }
 .wa-button-big { display: block; background: var(--wa-green); color: #fff; font-size: 18px; font-weight: 700; text-decoration: none; padding: 18px; border-radius: 14px; box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35); }
 .wa-button-big:active { background: var(--wa-green-dark); }
 
@@ -199,4 +192,110 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
   color: var(--ink-soft);
   font-size: 15px;
   padding: 20px 0;
+}
+
+/* ===== Informasi Pendaftaran ===== */
+.info-grid { display: block; }
+
+.info-block { margin-top: 32px; text-align: left; }
+.info-grid .info-block:first-child { margin-top: 24px; }
+
+.info-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--sky-700);
+  margin: 0 0 14px;
+}
+
+/* Jadwal */
+.jadwal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.jadwal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 6px rgba(7, 89, 133, 0.08);
+}
+.jadwal-no {
+  flex: 0 0 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--sky-600);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jadwal-nama { font-size: 17px; font-weight: 600; color: var(--ink); }
+.jadwal-tanggal { font-size: 15px; color: var(--sky-700); margin-top: 2px; }
+
+/* Dokumen */
+.info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 6px rgba(7, 89, 133, 0.08);
+}
+.check-list { list-style: none; margin: 0; padding: 0; }
+.check-list li {
+  position: relative;
+  padding: 8px 0 8px 34px;
+  font-size: 17px;
+  color: var(--ink);
+}
+.check-list li::before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--sky-100);
+  color: var(--sky-700);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Kelompok */
+.kelompok-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.kelompok-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 6px rgba(7, 89, 133, 0.08);
+  border-top: 4px solid var(--sky-500);
+}
+.kelompok-nama { font-size: 19px; font-weight: 700; color: var(--ink); }
+.kelompok-usia { font-size: 15px; color: var(--ink-soft); margin-top: 4px; }
+
+/* Catatan & lainnya */
+.catatan-list, .lain-list { margin: 0; padding-left: 22px; }
+.catatan-list li, .lain-list li { font-size: 16px; color: var(--ink); padding: 3px 0; }
+
+/* Cara mendaftar */
+.cara-teks { font-size: 17px; color: var(--ink); margin: 0 0 16px; }
+.cara-daftar .wa-button-big { display: block; text-align: center; }
+
+@media (min-width: 640px) {
+  .jadwal-list { grid-template-columns: 1fr 1fr; }
+  .kelompok-grid { grid-template-columns: 1fr 1fr; }
+  .cara-daftar .wa-button-big { display: inline-block; }
 }

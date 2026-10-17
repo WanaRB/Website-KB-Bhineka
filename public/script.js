@@ -220,6 +220,152 @@ const PLACEHOLDER = 'img/placeholder.svg';
     if (rest) groups.push(rest);
     return groups.join('-');
   }
+    var KATEGORI_VALID = ['jadwal', 'dokumen', 'kelompok', 'catatan', 'lainnya'];
+
+  function inferKategori(judul) {
+    var j = String(judul || '').toLowerCase();
+    if (/dokumen|pas\s*foto|berkas|persyaratan/.test(j)) return 'dokumen';
+    if (/usia|kelas|kelompok/.test(j)) return 'kelompok';
+    if (/jadwal|tanggal|pengumuman|wawancara|observasi|daftar ulang|registrasi/.test(j)) return 'jadwal';
+    if (/catatan|keterangan/.test(j)) return 'catatan';
+    return 'lainnya';
+  }
+
+  function capFirst(s) {
+    s = String(s || '').trim();
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+  }
+
+  function ikutiHuruf(asli, kata) {
+    var c = asli.charAt(0);
+    var besar = c !== c.toLowerCase();
+    return besar ? kata.charAt(0).toUpperCase() + kata.slice(1) : kata;
+  }
+
+  // Normalisasi hanya saat tampil; data di database tidak diubah
+  function rapikanEjaan(s) {
+    return String(s || '')
+      .replace(/\bfoto\s*(?:copy|kopi)\b/gi, function (m) { return ikutiHuruf(m, 'fotokopi'); })
+      .replace(/\bakte\b/gi, function (m) { return ikutiHuruf(m, 'akta'); })
+      .replace(/\bpas\s*foto\b|\bpasphoto\b/gi, function (m) { return ikutiHuruf(m, 'pasfoto'); });
+  }
+
+  function rapikanRentang(s) {
+    s = String(s || '').trim();
+    if (/\d{1,2}\s*[-\/.]\s*\d{1,2}\s*[-\/.]\s*\d{2,4}/.test(s)) return s; // tanggal 10-06-2026 jangan diubah
+    return s.replace(/(\d)\s*[-\u2013\u2014]\s*(\d)/g, '$1\u2013$2');
+  }
+
+  function buat(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined && text !== null) el.textContent = text;
+    return el;
+  }
+
+  function tambahBlok(container, judul, isi) {
+    var blok = buat('div', 'info-block');
+    blok.appendChild(buat('h3', 'info-heading', judul));
+    blok.appendChild(isi);
+    container.appendChild(blok);
+  }
+
+  function renderInfoPendaftaran(raw) {
+    var container = document.getElementById('info-grid');
+    if (!container) return;
+
+    var items;
+    try { items = JSON.parse(raw || '[]'); } catch (e) { items = []; }
+    if (!Array.isArray(items)) items = [];
+
+    var grup = { jadwal: [], dokumen: [], kelompok: [], catatan: [], lainnya: [] };
+    items.forEach(function (it) {
+      if (!it) return;
+      var judul = String(it.judul || '').trim();
+      var isi = String(it.isi || '').trim();
+      if (!judul && !isi) return;
+      var kat = KATEGORI_VALID.indexOf(it.kategori) !== -1 ? it.kategori : inferKategori(judul);
+      grup[kat].push({ judul: judul, isi: isi });
+    });
+
+    container.innerHTML = '';
+
+    if (grup.jadwal.length) {
+      var olJadwal = buat('ol', 'jadwal-list');
+      grup.jadwal.forEach(function (g, i) {
+        var li = buat('li', 'jadwal-item');
+        li.appendChild(buat('span', 'jadwal-no', String(i + 1)));
+        var body = buat('div', 'jadwal-body');
+        body.appendChild(buat('div', 'jadwal-nama', capFirst(rapikanEjaan(g.judul || g.isi))));
+        if (g.judul && g.isi) body.appendChild(buat('div', 'jadwal-tanggal', rapikanRentang(g.isi)));
+        li.appendChild(body);
+        olJadwal.appendChild(li);
+      });
+      tambahBlok(container, 'Jadwal Pendaftaran', olJadwal);
+    }
+
+    if (grup.dokumen.length) {
+      var kartuDokumen = buat('div', 'info-card');
+      var ulDokumen = buat('ul', 'check-list');
+      grup.dokumen.forEach(function (g) {
+        var umum = !g.judul || /^(dokumen|pas\s*foto|berkas|persyaratan)$/i.test(g.judul);
+        var teks = umum ? (g.isi || g.judul) : (g.isi ? g.judul + ': ' + g.isi : g.judul);
+        ulDokumen.appendChild(buat('li', null, capFirst(rapikanEjaan(teks))));
+      });
+      kartuDokumen.appendChild(ulDokumen);
+      tambahBlok(container, 'Dokumen yang Dibawa', kartuDokumen);
+    }
+
+    if (grup.kelompok.length) {
+      var gridKelompok = buat('div', 'kelompok-grid');
+      grup.kelompok.forEach(function (g) {
+        var cocok = g.judul.match(/\b(?:kelas|kelompok|kel)\b\.?\s*([A-Za-z0-9]+)/i);
+        var nama;
+        if (cocok) {
+          var kode = cocok[1];
+          nama = 'Kelompok ' + (kode.length <= 2 ? kode.toUpperCase() : capFirst(kode));
+        } else {
+          nama = capFirst(rapikanEjaan(g.judul || 'Kelompok'));
+        }
+        var usia = rapikanRentang(g.isi);
+        if (cocok && usia && !/^usia/i.test(usia)) usia = 'Usia ' + usia;
+        var kartuKelompok = buat('div', 'kelompok-card');
+        kartuKelompok.appendChild(buat('div', 'kelompok-nama', nama));
+        if (usia) kartuKelompok.appendChild(buat('div', 'kelompok-usia', usia));
+        gridKelompok.appendChild(kartuKelompok);
+      });
+      tambahBlok(container, 'Usia dan Kelompok', gridKelompok);
+    }
+
+    if (grup.catatan.length) {
+      var ulCatatan = buat('ul', 'catatan-list');
+      grup.catatan.forEach(function (g) {
+        var umum = !g.judul || /^(catatan|keterangan)$/i.test(g.judul);
+        var teks = umum ? (g.isi || g.judul) : (g.isi ? g.judul + ': ' + g.isi : g.judul);
+        if (teks) ulCatatan.appendChild(buat('li', null, capFirst(rapikanEjaan(teks))));
+      });
+      tambahBlok(container, 'Catatan', ulCatatan);
+    }
+
+    if (grup.lainnya.length) {
+      var ulLain = buat('ul', 'lain-list');
+      grup.lainnya.forEach(function (g) {
+        var li = buat('li');
+        if (g.judul && g.isi) {
+          li.appendChild(buat('strong', null, capFirst(rapikanEjaan(g.judul)) + ':'));
+          li.appendChild(document.createTextNode(' ' + capFirst(rapikanEjaan(g.isi))));
+        } else {
+          li.textContent = capFirst(rapikanEjaan(g.judul || g.isi));
+        }
+        ulLain.appendChild(li);
+      });
+      tambahBlok(container, 'Informasi Lainnya', ulLain);
+    }
+
+    if (!container.children.length) {
+      container.appendChild(buat('p', 'load-message', 'Informasi pendaftaran belum tersedia.'));
+    }
+  }
 
   function loadPengaturan(config) {
     supaFetch(config, 'pengaturan', 'select=key,value')
@@ -242,28 +388,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
           }
         }
 
-        if (map.info_pendaftaran) {
-          try {
-            var infoItems = JSON.parse(map.info_pendaftaran);
-            var infoGrid = document.getElementById('info-grid');
-            if (infoGrid && Array.isArray(infoItems)) {
-              infoGrid.innerHTML = '';
-              infoItems.forEach(function (item) {
-                var div = document.createElement('div');
-                div.className = 'info-item';
-                var label = document.createElement('span');
-                label.className = 'info-label';
-                label.textContent = item.judul;
-                var value = document.createElement('span');
-                value.className = 'info-value';
-                value.textContent = item.isi;
-                div.appendChild(label);
-                div.appendChild(value);
-                infoGrid.appendChild(div);
-              });
-            }
-          } catch (e) {}
-        }
+        renderInfoPendaftaran(map.info_pendaftaran);
 
         if (map.no_telp) {
           var digits = normalizePhone(map.no_telp);

@@ -15,6 +15,7 @@ type Settings = {
   no_telp: string;
   jam_operasional: string;
   cta_teks: string;
+  wa_pesan: string;
 };
 
 const EMPTY: Settings = {
@@ -28,6 +29,7 @@ const EMPTY: Settings = {
   no_telp: '',
   jam_operasional: '',
   cta_teks: '',
+  wa_pesan: '',
 };
 
 const KATEGORI = [
@@ -120,6 +122,28 @@ export default function PengaturanPage() {
       return { ...f, info_pendaftaran: next };
     });
     setSaved(false);
+  }
+
+    function moveInfoItem(index: number, dir: -1 | 1) {
+    setForm((f) => {
+      const list = f.info_pendaftaran;
+      const kat = list[index].kategori;
+      let target = index + dir;
+      while (target >= 0 && target < list.length && list[target].kategori !== kat) target += dir;
+      if (target < 0 || target >= list.length) return f;
+      const next = [...list];
+      [next[index], next[target]] = [next[target], next[index]];
+      return { ...f, info_pendaftaran: next };
+    });
+    setSaved(false);
+  }
+
+  function bisaPindah(index: number, dir: -1 | 1): boolean {
+    const list = form.info_pendaftaran;
+    const kat = list[index].kategori;
+    let target = index + dir;
+    while (target >= 0 && target < list.length && list[target].kategori !== kat) target += dir;
+    return target >= 0 && target < list.length;
   }
 
   function removeInfoItem(index: number) {
@@ -273,7 +297,7 @@ export default function PengaturanPage() {
                 value={item.kategori}
                 onChange={(e) => updateInfoItem(i, 'kategori', e.target.value)}
                 style={{
-                  flex: '0 0 100%',
+                  flex: '1 1 160px',
                   padding: '10px 12px',
                   border: '1px solid var(--border)',
                   borderRadius: 8,
@@ -287,6 +311,28 @@ export default function PengaturanPage() {
                   </option>
                 ))}
               </select>
+
+                            <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => moveInfoItem(i, -1)}
+                disabled={!bisaPindah(i, -1)}
+                aria-label="Naikkan"
+                title="Naikkan"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => moveInfoItem(i, 1)}
+                disabled={!bisaPindah(i, 1)}
+                aria-label="Turunkan"
+                title="Turunkan"
+              >
+                ▼
+              </button>
+
               <input
                 placeholder={kat.judul}
                 value={item.judul}
@@ -347,6 +393,18 @@ export default function PengaturanPage() {
           rows={3}
           placeholder="contoh: Daftar langsung ke sekolah, atau tanya-tanya dulu lewat WhatsApp."
         />
+
+                <label htmlFor="wa_pesan">Pesan awal WhatsApp</label>
+        <textarea
+          id="wa_pesan"
+          value={form.wa_pesan}
+          onChange={(e) => update('wa_pesan', e.target.value)}
+          rows={3}
+          placeholder="contoh: Halo, saya ingin bertanya tentang pendaftaran."
+        />
+        <p style={{ fontSize: 13, color: '#64748b', marginTop: -8 }}>
+          Teks ini otomatis terisi di kolom chat saat orang tua menekan tombol WhatsApp. Kosongkan jika tidak ingin ada teks awal.
+        </p>
 
         {error && <p className="form-error">{error}</p>}
         {saved && <p className="form-saved">Tersimpan.</p>}

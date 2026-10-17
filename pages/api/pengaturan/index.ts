@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 
-const KEYS = ['tagline', 'foto_hero_url', 'foto_profil_url', 'tentang_teks', 'info_pendaftaran', 'alamat', 'no_telp', 'maps_koordinat', 'jam_operasional', 'cta_teks'];
+const KEYS = ['tagline', 'foto_hero_url', 'foto_profil_url', 'tentang_teks', 'info_pendaftaran', 'alamat', 'no_telp', 'maps_koordinat', 'jam_operasional', 'cta_teks', 'cta_teks', 'wa_pesan'];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createSupabaseServerClient(req, res);

@@ -367,6 +367,12 @@ const PLACEHOLDER = 'img/placeholder.svg';
     }
   }
 
+    function linkWA(phone, pesan) {
+    var url = 'https://wa.me/' + normalizePhone(phone);
+    if (pesan) url += '?text=' + encodeURIComponent(pesan);
+    return url;
+  }
+
   function loadPengaturan(config) {
     supaFetch(config, 'pengaturan', 'select=key,value')
       .then(function (rows) {
@@ -398,8 +404,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
               phoneLink.setAttribute('href', 'tel:+' + digits);
               phoneLink.textContent = '\uD83D\uDCDE ' + formatPhoneDisplay(digits);
             }
-            var waMsg = 'Halo, saya ingin tanya-tanya soal Daftar Sekolah di KB Bhineka Tunggal Ika';
-            var waUrl = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(waMsg);
+            var waUrl = linkWA(map.no_telp, map.wa_pesan);
             setAttr('wa-cta', 'href', waUrl);
           }
         } else {

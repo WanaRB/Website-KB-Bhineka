@@ -1,0 +1,414 @@
+.wrap {
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #0B3A5A;
+  background: #EAF7FE;
+  border-radius: 20px;
+  padding: 16px;
+  margin: 8px 0 24px;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.wrap .topTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1673A8;
+}
+
+.wrap .topDesc {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: #0B3A5A;
+}
+
+.wrap .previewLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #8FD3F4;
+  color: #1673A8;
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: none;
+}
+.wrap .previewLink:hover {
+  background: #8FD3F4;
+  color: #0B3A5A;
+}
+
+/* ===== Bagian ===== */
+.section {
+  container-type: inline-size;
+  background: #fff;
+  border: 1px solid #CFE9F7;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wrap .sectionTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1673A8;
+}
+
+.badge {
+  background: #EAF7FE;
+  color: #1673A8;
+  padding: 2px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wrap .hint {
+  margin: 6px 0 16px;
+  font-size: 15px;
+  color: #0B3A5A;
+}
+
+.wrap .empty {
+  margin: 0 0 14px;
+  padding: 16px;
+  text-align: center;
+  border: 2px dashed #8FD3F4;
+  border-radius: 14px;
+  background: #F4FBFF;
+  color: #0B3A5A;
+  font-size: 15px;
+}
+
+/* ===== Baris ===== */
+.list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #CFE9F7;
+  border-radius: 14px;
+  background: #F8FCFF;
+}
+.rowOver {
+  border-color: #1673A8;
+  background: #EAF7FE;
+  box-shadow: 0 0 0 3px #8FD3F4;
+}
+.rowDragging {
+  opacity: 0.45;
+}
+
+.rowLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1673A8;
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grip {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #CFE9F7;
+  background: #fff;
+  color: #1673A8;
+  cursor: grab;
+}
+.grip:active {
+  cursor: grabbing;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.fieldsTwo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@container (min-width: 520px) {
+  .fieldsTwo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.wrap .label {
+  display: block;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0B3A5A;
+}
+
+.wrap .input,
+.wrap .textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 16px;
+  color: #0B3A5A;
+  background: #fff;
+  border: 2px solid #CFE9F7;
+  border-radius: 12px;
+}
+.wrap .textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+.wrap .input:focus,
+.wrap .textarea:focus {
+  outline: 3px solid #8FD3F4;
+  border-color: #1673A8;
+}
+
+/* ===== Tombol ===== */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.wrap .btnMove,
+.wrap .btnDelete,
+.wrap .addBtn {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.wrap .btnMove,
+.wrap .btnDelete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  margin: 0;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.wrap .btnMove {
+  border: 2px solid #8FD3F4;
+  color: #1673A8;
+}
+.wrap .btnMove:hover {
+  background: #EAF7FE;
+}
+
+.wrap .btnDelete {
+  margin-left: auto;
+  border: 2px solid #F3B8B8;
+  color: #B42318;
+}
+.wrap .btnDelete:hover {
+  background: #FEF3F2;
+}
+
+.wrap .addBtn {
+  width: 100%;
+  min-height: 48px;
+  border: 2px dashed #1673A8;
+  border-radius: 14px;
+  background: #EAF7FE;
+  color: #1673A8;
+  font-size: 16px;
+  font-weight: 800;
+}
+.wrap .addBtn:hover {
+  background: #8FD3F4;
+  color: #0B3A5A;
+}
+
+.wrap .btnMove:focus-visible,
+.wrap .btnDelete:focus-visible,
+.wrap .addBtn:focus-visible {
+  outline: 3px solid #8FD3F4;
+  outline-offset: 2px;
+}
+
+/* ===== Urungkan ===== */
+.undoBar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 96px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 18px;
+  border-radius: 999px;
+  background: #0B3A5A;
+  color: #fff;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(11, 58, 90, 0.3);
+}
+.undoBar button {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #8FD3F4;
+  color: #0B3A5A;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ===== Bar simpan (menempel di bawah) ===== */
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fff;
+  border-top: 2px solid #8FD3F4;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -6px 18px rgba(11, 58, 90, 0.1);
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.errorText {
+  flex-basis: 100%;
+  margin: 0;
+  color: #B42318;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.saveStatus {
+  font-size: 15px;
+  font-weight: 700;
+}
+.dirty {
+  color: #B54708;
+}
+.clean {
+  color: #1673A8;
+}
+
+.saveBtn {
+  min-height: 52px;
+  padding: 0 40px;
+  border: 0;
+  border-radius: 14px;
+  background: #1673A8;
+  color: #fff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.saveBtn:hover {
+  background: #0F5F8D;
+}
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.saveBtn:focus-visible {
+  outline: 3px solid #8FD3F4;
+  outline-offset: 2px;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 60;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: #1673A8;
+  color: #fff;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(11, 58, 90, 0.3);
+}
+
+@media (max-width: 520px) {
+  .saveBtn {
+    width: 100%;
+  }
+  .wrap {
+    padding: 12px;
+  }
+  .section {
+    padding: 16px;
+  }
+}

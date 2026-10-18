@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KB Bhineka Tunggal Ika — Sekolah Kelompok Bermain</title>
+  <meta name="description" content="KB Bhineka Tunggal Ika, tempat anak belajar sambil bermain. Chat WhatsApp untuk daftar sekarang." />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <img class="logo-dot" src="img/logo-sekolah.svg" alt="Logo Tut Wuri Handayani" />
+      <span class="header-name">KB Bhineka Tunggal Ika</span>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <img id="hero-photo" class="hero-photo" src="img/placeholder.svg" alt="Anak-anak KB Bhineka Tunggal Ika sedang bermain bersama" />
+    <div class="hero-overlay">
+      <h1>KB Bhineka Tunggal Ika</h1>
+      <p id="tagline">Tempat anak belajar sambil bermain, dengan penuh kasih sayang</p>
+    </div>
+  </section>
+
+  <main>
+    <!-- Profil -->
+    <section class="section" id="profil">
+      <h2>Tentang Kami</h2>
+      <div class="profil-wrap">
+        <img class="section-photo" id="profil-foto" src="img/placeholder.svg" alt="Suasana kelas KB Bhineka Tunggal Ika" />
+        <p id="profil-teks"></p>
+      </div>
+    </section>
+
+    <!-- Berita Acara -->
+    <section class="section" id="cara-belajar">
+      <h2>Berita Acara</h2>
+      <div class="berita-list" id="kegiatan-grid">
+        <p class="load-message">Memuat berita kegiatan...</p>
+      </div>
+    </section>
+
+    <!-- Galeri -->
+    <section class="section" id="galeri">
+      <h2>Kegiatan Kami</h2>
+      <div class="galeri-grid" id="galeri-grid">
+        <p class="load-message">Memuat galeri...</p>
+      </div>
+    </section>
+
+    <!-- Guru & Staff -->
+    <section class="section" id="guru">
+      <h2>Guru &amp; Staff Kami</h2>
+      <div class="guru-grid" id="guru-grid">
+        <p class="load-message">Memuat data guru &amp; staff...</p>
+      </div>
+    </section>
+
+    <!-- Testimoni -->
+    <section class="section" id="testimoni">
+      <h2>Kata Orang Tua Murid</h2>
+      <div class="testimoni-list" id="testimoni-list">
+        <p class="load-message">Memuat testimoni...</p>
+      </div>
+    </section>
+
+    <!-- Info Sekolah -->
+    <section class="section" id="info">
+  <h2>Informasi Pendaftaran</h2>
+  <div class="info-grid" id="info-grid"></div>
+
+  <div class="info-block cara-daftar">
+    <h3 class="info-heading">Cara Mendaftar</h3>
+    <p class="cara-teks" id="cta-teks">Daftar langsung ke sekolah, atau tanya dulu lewat WhatsApp.</p>
+    <a class="wa-button-big" id="wa-cta" href="#" target="_blank" rel="noopener">💬 Chat WA untuk Daftar</a>
+  </div>
+</section>
+
+    <!-- Lokasi & Kontak -->
+    <section class="section" id="kontak">
+      <h2>Lokasi &amp; Kontak</h2>
+      <p class="alamat" id="alamat-text">
+        Jl. Contoh Alamat No. 123, Desa Contoh, Kecamatan Contoh, Kabupaten Contoh
+      </p>
+      <div class="maps-wrap">
+        <iframe
+          id="maps-frame"
+          title="Lokasi KB Bhineka Tunggal Ika"
+          src="https://maps.google.com/maps?q=KB%20Bhineka%20Tunggal%20Ika&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+      <a class="phone-link" id="phone-link" href="#">
+        📞 Memuat nomor...
+      </a>
+      <p class="jam" id="jam-text">Senin – Jumat, 07.30 – 11.00</p>
+    </section>
+
+    <!-- CTA Akhir-->
+    <section class="cta-final">
+      <h2 id="cta-teks">Tertarik menyekolahkan anak Anda di sini?</h2>
+      <a class="wa-button-big" id="wa-cta" href="#" target="_blank" rel="noopener">
+        💬 Chat WA untuk Daftar
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>KB Bhineka Tunggal Ika © <span id="tahun"></span></p>
+  </footer>
+
+  <!-- Lightbox galeri -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightboxClose" aria-label="Tutup">✕</button>
+    <img id="lightboxImg" src="img/placeholder.svg" alt="Foto kegiatan diperbesar" />
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>

@@ -3,11 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KB Bhineka Tunggal Ika — Sekolah Kelompok Bermain</title>
-  <meta name="description" content="KB Bhineka Tunggal Ika, tempat anak belajar sambil bermain. Chat WhatsApp untuk daftar sekarang." />
+  <title>KB Bhineka Tunggal Ika — Kelompok Bermain Ramah Anak</title>
+  <meta name="description" content="KB Bhineka Tunggal Ika, kelompok bermain tempat anak belajar sambil bermain dengan penuh kasih sayang. Lihat jadwal, dokumen, dan cara daftar, lalu chat WhatsApp." />
+  <meta name="theme-color" content="#8FD3F4" />
+
+  <!-- Tampil saat dibagikan (WhatsApp, Facebook, dll.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:site_name" content="KB Bhineka Tunggal Ika" />
+  <meta property="og:title" content="KB Bhineka Tunggal Ika — Kelompok Bermain Ramah Anak" />
+  <meta property="og:description" content="Tempat anak belajar sambil bermain dengan penuh kasih sayang. Lihat informasi pendaftaran dan chat WhatsApp." />
+
+  <link rel="icon" type="image/svg+xml" href="/img/logo-sekolah.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+  <a class="skip-link" href="#konten">Lewati ke konten utama</a>
 
   <!-- Header -->
   <header class="site-header">
@@ -18,18 +33,18 @@
   </header>
 
   <!-- Hero -->
-  <section class="hero">
-    <img id="hero-photo" class="hero-photo" src="img/placeholder.svg" alt="Anak-anak KB Bhineka Tunggal Ika sedang bermain bersama" />
+  <section class="hero" aria-label="Sambutan">
+    <img id="hero-photo" class="hero-photo" src="img/placeholder.svg" alt="Anak-anak KB Bhineka Tunggal Ika sedang bermain bersama" fetchpriority="high" />
     <div class="hero-overlay">
       <h1>KB Bhineka Tunggal Ika</h1>
       <p id="tagline">Tempat anak belajar sambil bermain, dengan penuh kasih sayang</p>
     </div>
   </section>
 
-  <main>
+  <main id="konten">
     <!-- Profil -->
-    <section class="section" id="profil">
-      <h2>Tentang Kami</h2>
+    <section class="section" id="profil" aria-labelledby="judul-profil">
+      <h2 id="judul-profil">Tentang Kami</h2>
       <div class="profil-wrap">
         <img class="section-photo" id="profil-foto" src="img/placeholder.svg" alt="Suasana kelas KB Bhineka Tunggal Ika" />
         <p id="profil-teks"></p>
@@ -37,57 +52,57 @@
     </section>
 
     <!-- Berita Acara -->
-    <section class="section" id="cara-belajar">
-      <h2>Berita Acara</h2>
+    <section class="section" id="cara-belajar" aria-labelledby="judul-berita">
+      <h2 id="judul-berita">Berita Acara</h2>
       <div class="berita-list" id="kegiatan-grid">
         <p class="load-message">Memuat berita kegiatan...</p>
       </div>
     </section>
 
     <!-- Galeri -->
-    <section class="section" id="galeri">
-      <h2>Kegiatan Kami</h2>
+    <section class="section" id="galeri" aria-labelledby="judul-galeri">
+      <h2 id="judul-galeri">Kegiatan Kami</h2>
       <div class="galeri-grid" id="galeri-grid">
         <p class="load-message">Memuat galeri...</p>
       </div>
     </section>
 
     <!-- Guru & Staff -->
-    <section class="section" id="guru">
-      <h2>Guru &amp; Staff Kami</h2>
+    <section class="section" id="guru" aria-labelledby="judul-guru">
+      <h2 id="judul-guru">Guru &amp; Staff Kami</h2>
       <div class="guru-grid" id="guru-grid">
         <p class="load-message">Memuat data guru &amp; staff...</p>
       </div>
     </section>
 
     <!-- Testimoni -->
-    <section class="section" id="testimoni">
-      <h2>Kata Orang Tua Murid</h2>
+    <section class="section" id="testimoni" aria-labelledby="judul-testimoni">
+      <h2 id="judul-testimoni">Kata Orang Tua Murid</h2>
       <div class="testimoni-list" id="testimoni-list">
         <p class="load-message">Memuat testimoni...</p>
       </div>
     </section>
 
-    <!-- Info Sekolah -->
-    <section class="section" id="info">
-  <h2>Informasi Pendaftaran</h2>
-  <div class="info-grid" id="info-grid"></div>
+    <!-- Informasi Pendaftaran -->
+    <section class="section" id="info" aria-labelledby="judul-info">
+      <h2 id="judul-info">Informasi Pendaftaran</h2>
+      <div class="info-grid" id="info-grid"></div>
 
-    <div class="info-block cara-daftar">
-    <a class="wa-button-big" id="wa-cta" href="#" target="_blank" rel="noopener">💬 Chat WA untuk Daftar</a>
-  </div>
-</section>
+      <div class="info-block cara-daftar">
+        <a class="wa-button-big" id="wa-cta" href="#" target="_blank" rel="noopener" hidden>💬 Chat WA untuk Daftar</a>
+      </div>
+    </section>
 
     <!-- Lokasi & Kontak -->
-    <section class="section" id="kontak">
-      <h2>Lokasi &amp; Kontak</h2>
+    <section class="section" id="kontak" aria-labelledby="judul-kontak">
+      <h2 id="judul-kontak">Lokasi &amp; Kontak</h2>
       <p class="alamat" id="alamat-text">
         Jl. Contoh Alamat No. 123, Desa Contoh, Kecamatan Contoh, Kabupaten Contoh
       </p>
       <div class="maps-wrap">
         <iframe
           id="maps-frame"
-          title="Lokasi KB Bhineka Tunggal Ika"
+          title="Peta lokasi KB Bhineka Tunggal Ika"
           src="https://maps.google.com/maps?q=KB%20Bhineka%20Tunggal%20Ika&t=&z=15&ie=UTF8&iwloc=&output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
@@ -98,25 +113,23 @@
       </a>
       <p class="jam" id="jam-text">Senin – Jumat, 07.30 – 11.00</p>
     </section>
-
-    
   </main>
 
   <footer class="site-footer">
     <p>KB Bhineka Tunggal Ika © <span id="tahun"></span></p>
   </footer>
 
-    <!-- Tombol WhatsApp mengambang -->
+  <!-- Tombol WhatsApp mengambang -->
   <a class="wa-float" id="wa-float" href="#" target="_blank" rel="noopener" aria-label="Chat WhatsApp" hidden>
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
       <path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
     </svg>
     <span>Chat WhatsApp</span>
   </a>
 
   <!-- Lightbox galeri -->
-  <div class="lightbox" id="lightbox" hidden>
-    <button class="lightbox-close" id="lightboxClose" aria-label="Tutup">✕</button>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto diperbesar" hidden>
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Tutup foto">✕</button>
     <img id="lightboxImg" src="img/placeholder.svg" alt="Foto kegiatan diperbesar" />
   </div>
 

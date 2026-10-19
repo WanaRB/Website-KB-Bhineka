@@ -8,23 +8,52 @@ const PLACEHOLDER = 'img/placeholder.svg';
   var lightbox = document.getElementById('lightbox');
   var lightboxImg = document.getElementById('lightboxImg');
   var lightboxClose = document.getElementById('lightboxClose');
+  var fokusSebelumnya = null;
 
   function openLightbox(src, alt) {
+    fokusSebelumnya = document.activeElement;
     lightboxImg.src = src;
     lightboxImg.alt = alt || 'Foto kegiatan';
     lightbox.hidden = false;
+    document.body.classList.add('lightbox-open');
+    if (lightboxClose) lightboxClose.focus();
   }
 
   function closeLightbox() {
     lightbox.hidden = true;
-    lightboxImg.src = '';
+    lightboxImg.removeAttribute('src');
+    document.body.classList.remove('lightbox-open');
+    if (fokusSebelumnya && fokusSebelumnya.focus) fokusSebelumnya.focus();
   }
 
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
   if (lightbox) {
-      document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && lightbox && !lightbox.hidden) closeLightbox();
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!lightbox || lightbox.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    // Fokus tetap di dalam lightbox
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (lightboxClose) lightboxClose.focus();
+    }
   });
+
+  // Foto yang bisa diperbesar juga bisa dibuka dengan keyboard (Enter / Spasi)
+  function bisaDiperbesar(img) {
+    if (!img) return;
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.setAttribute('aria-label', 'Perbesar foto: ' + (img.alt || 'foto'));
+    img.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        img.click();
+      }
+    });
   }
 
   function showLoadError(containerId, message) {
@@ -44,7 +73,10 @@ const PLACEHOLDER = 'img/placeholder.svg';
     showLoadError('guru-grid', msg);
     showLoadError('testimoni-list', msg);
     var phoneLinkEl = document.getElementById('phone-link');
-    if (phoneLinkEl) phoneLinkEl.textContent = '📞 Nomor belum tersedia';
+    if (phoneLinkEl) {
+      phoneLinkEl.textContent = '📞 Nomor belum tersedia';
+      phoneLinkEl.removeAttribute('href');
+    }
   }
 
   // ---------- Ambil data sekolah dari Supabase ----------
@@ -98,6 +130,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
           img.alt = item.judul || 'Foto kegiatan';
           img.loading = 'lazy';
           img.addEventListener('click', function () { openLightbox(img.src, img.alt); });
+          bisaDiperbesar(img);
           var h3 = document.createElement('h3');
           h3.textContent = item.judul || '';
           card.appendChild(img);
@@ -108,18 +141,6 @@ const PLACEHOLDER = 'img/placeholder.svg';
       .catch(function () {
         showLoadError('galeri-grid', 'Galeri belum bisa ditampilkan saat ini. Silakan hubungi kami langsung lewat WhatsApp.');
       });
-  }
-
-  var BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-  function formatTanggal(tanggal) {
-    if (!tanggal) return '';
-    var parts = tanggal.split('-');
-    var y = parseInt(parts[0], 10);
-    var m = parseInt(parts[1], 10) - 1;
-    var d = parseInt(parts[2], 10);
-    if (isNaN(y) || isNaN(m) || isNaN(d)) return tanggal;
-    return d + ' ' + BULAN_ID[m] + ' ' + y;
   }
 
   function loadKegiatan(config) {
@@ -142,9 +163,10 @@ const PLACEHOLDER = 'img/placeholder.svg';
           if (item.foto_url) {
             var img = document.createElement('img');
             img.src = item.foto_url || PLACEHOLDER;
-            img.alt = item.judul || '';
+            img.alt = item.judul ? 'Foto kegiatan: ' + item.judul : 'Foto berita kegiatan';
             img.loading = 'lazy';
             img.className = 'berita-item-img';
+            bisaDiperbesar(img);
             card.appendChild(img);
           }
           var body = document.createElement('div');
@@ -184,8 +206,9 @@ const PLACEHOLDER = 'img/placeholder.svg';
           if (item.foto_url) {
             var img = document.createElement('img');
             img.src = item.foto_url || PLACEHOLDER;
-            img.alt = item.nama || '';
+            img.alt = item.nama ? 'Foto ' + item.nama + (item.jabatan ? ', ' + item.jabatan : '') : 'Foto guru';
             img.loading = 'lazy';
+            bisaDiperbesar(img);
             card.appendChild(img);
           }
           var h3 = document.createElement('h3');
@@ -201,13 +224,14 @@ const PLACEHOLDER = 'img/placeholder.svg';
         showLoadError('guru-grid', 'Data guru & staff belum bisa ditampilkan saat ini. Silakan hubungi kami langsung lewat WhatsApp.');
       });
   }
+
   function normalizePhone(raw) {
-  var digits = String(raw || '').replace(/\D/g, '');
-  if (digits.indexOf('0') === 0) {
-    digits = '62' + digits.slice(1);
+    var digits = String(raw || '').replace(/\D/g, '');
+    if (digits.indexOf('0') === 0) {
+      digits = '62' + digits.slice(1);
+    }
+    return digits;
   }
-  return digits;
-}
 
   function formatPhoneDisplay(digits) {
     var local = digits.indexOf('62') === 0 ? '0' + digits.slice(2) : digits;
@@ -221,7 +245,8 @@ const PLACEHOLDER = 'img/placeholder.svg';
     if (rest) groups.push(rest);
     return groups.join('-');
   }
-    var KATEGORI_VALID = ['jadwal', 'dokumen', 'kelompok', 'lainnya'];
+
+  var KATEGORI_VALID = ['jadwal', 'dokumen', 'kelompok', 'lainnya'];
 
   function inferKategori(judul) {
     var j = String(judul || '').toLowerCase();
@@ -361,12 +386,13 @@ const PLACEHOLDER = 'img/placeholder.svg';
     }
   }
 
-    function linkWA(phone, pesan) {
+  function linkWA(phone, pesan) {
     var url = 'https://wa.me/' + normalizePhone(phone);
     if (pesan) url += '?text=' + encodeURIComponent(pesan);
     return url;
   }
 
+  // Foto yang bisa diperbesar dengan lightbox galeri: Tentang Kami, Guru & Staff, Berita Acara
   function initZoomFoto() {
     var selektor = '#profil-foto, #guru-grid img, #kegiatan-grid img';
     document.addEventListener('click', function (e) {
@@ -378,6 +404,19 @@ const PLACEHOLDER = 'img/placeholder.svg';
     });
   }
 
+  // Data terstruktur untuk mesin pencari (diisi dari data yang diatur admin)
+  function isiDataTerstruktur(map, digits) {
+    var data = { '@context': 'https://schema.org', '@type': 'Preschool', name: 'KB Bhineka Tunggal Ika' };
+    if (map.tentang_teks) data.description = map.tentang_teks;
+    if (map.alamat) data.address = { '@type': 'PostalAddress', streetAddress: map.alamat, addressCountry: 'ID' };
+    if (digits) data.telephone = '+' + digits;
+    if (map.foto_hero_url) data.image = map.foto_hero_url;
+    var s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(data);
+    document.head.appendChild(s);
+  }
+
   function loadPengaturan(config) {
     supaFetch(config, 'pengaturan', 'select=key,value')
       .then(function (rows) {
@@ -387,6 +426,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
 
         setText('tagline', map.tagline);
         setAttr('profil-foto', 'src', map.foto_profil_url);
+        if (map.foto_profil_url) bisaDiperbesar(document.getElementById('profil-foto'));
         setText('profil-teks', map.tentang_teks);
         setAttr('hero-photo', 'src', map.foto_hero_url);
         setText('alamat-text', map.alamat);
@@ -400,8 +440,9 @@ const PLACEHOLDER = 'img/placeholder.svg';
 
         renderInfoPendaftaran(map.info_pendaftaran);
 
+        var digits = '';
         if (map.no_telp) {
-          var digits = normalizePhone(map.no_telp);
+          digits = normalizePhone(map.no_telp);
           if (digits) {
             var phoneLink = document.getElementById('phone-link');
             if (phoneLink) {
@@ -409,7 +450,11 @@ const PLACEHOLDER = 'img/placeholder.svg';
               phoneLink.textContent = '\uD83D\uDCDE ' + formatPhoneDisplay(digits);
             }
             var waUrl = linkWA(map.no_telp, map.wa_pesan);
-            setAttr('wa-cta', 'href', waUrl);
+            var waCta = document.getElementById('wa-cta');
+            if (waCta) {
+              waCta.setAttribute('href', waUrl);
+              waCta.hidden = false;
+            }
             var waFloat = document.getElementById('wa-float');
             if (waFloat) {
               waFloat.setAttribute('href', waUrl);
@@ -418,8 +463,13 @@ const PLACEHOLDER = 'img/placeholder.svg';
           }
         } else {
           var phoneLinkEl = document.getElementById('phone-link');
-          if (phoneLinkEl) phoneLinkEl.textContent = '📞 Nomor belum diatur admin';
+          if (phoneLinkEl) {
+            phoneLinkEl.textContent = '📞 Nomor belum diatur admin';
+            phoneLinkEl.removeAttribute('href');
+          }
         }
+
+        isiDataTerstruktur(map, digits);
       });
   }
 

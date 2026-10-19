@@ -391,7 +391,6 @@ const PLACEHOLDER = 'img/placeholder.svg';
         setAttr('hero-photo', 'src', map.foto_hero_url);
         setText('alamat-text', map.alamat);
         setText('jam-text', map.jam_operasional);
-        setText('cta-teks', map.cta_teks);
         if (map.maps_koordinat) {
           var frame = document.getElementById('maps-frame');
           if (frame) {
@@ -411,6 +410,11 @@ const PLACEHOLDER = 'img/placeholder.svg';
             }
             var waUrl = linkWA(map.no_telp, map.wa_pesan);
             setAttr('wa-cta', 'href', waUrl);
+            var waFloat = document.getElementById('wa-float');
+            if (waFloat) {
+              waFloat.setAttribute('href', waUrl);
+              waFloat.hidden = false;
+            }
           }
         } else {
           var phoneLinkEl = document.getElementById('phone-link');

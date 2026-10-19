@@ -222,15 +222,6 @@ export default function PengaturanPage() {
           onChange={(rows) => update('info_pendaftaran', rows)}
         />
 
-        <label htmlFor="cta_teks">Cara mendaftar (penjelasan singkat)</label>
-        <textarea
-          id="cta_teks"
-          value={form.cta_teks}
-          onChange={(e) => update('cta_teks', e.target.value)}
-          rows={3}
-          placeholder="contoh: Daftar langsung ke sekolah, atau tanya-tanya dulu lewat WhatsApp."
-        />
-
         <label htmlFor="wa_pesan">Pesan awal WhatsApp</label>
         <textarea
           id="wa_pesan"

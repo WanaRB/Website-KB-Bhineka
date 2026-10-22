@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/router';
 
@@ -20,7 +21,7 @@ export default function LoginPage() {
     setLoading(false);
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error || 'Gagal masuk');
+      setError(body.error || 'Gagal masuk. Periksa email dan kata sandi.');
       return;
     }
     router.push('/admin/dashboard');
@@ -28,7 +29,11 @@ export default function LoginPage() {
 
   return (
     <div className="login-wrap">
+      <Head>
+        <title>Masuk Admin — KB Bhineka Tunggal Ika</title>
+      </Head>
       <form className="login-card" onSubmit={handleSubmit}>
+        <img src="/img/logo-sekolah.svg" alt="" className="login-logo" />
         <h1>Masuk Admin</h1>
         <p className="login-sub">KB Bhineka Tunggal Ika</p>
 
@@ -52,7 +57,11 @@ export default function LoginPage() {
           autoComplete="current-password"
         />
 
-        {error && <p className="login-error">{error}</p>}
+        {error && (
+          <p className="login-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <button type="submit" disabled={loading}>
           {loading ? 'Memproses...' : 'Masuk'}

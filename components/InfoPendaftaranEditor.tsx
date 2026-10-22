@@ -114,7 +114,7 @@ const SECTIONS: SectionDef[] = [
     hint: 'Tulis satu dokumen di tiap baris. Pasfoto juga ditulis di sini.',
     empty: 'Belum ada dokumen.',
     addLabel: '+ Tambah dokumen',
-    fields: [{ key: 'isi', label: 'Nama dokumen', placeholder: 'Contoh: Fotokopi Kartu Keluarga' }],
+        fields: [{ key: 'isi', label: 'Nama dokumen', placeholder: 'Contoh: Fotokopi Kartu Keluarga', multiline: true }],
   },
   {
     kat: 'kelompok',
@@ -136,7 +136,7 @@ const SECTIONS: SectionDef[] = [
     addLabel: '+ Tambah informasi',
     fields: [
       { key: 'judul', label: 'Judul (boleh kosong)', placeholder: 'Contoh: Biaya' },
-      { key: 'isi', label: 'Isi', placeholder: 'Contoh: Hubungi sekolah' },
+            { key: 'isi', label: 'Isi', placeholder: 'Contoh: Hubungi sekolah', multiline: true },
     ],
   },
 ];

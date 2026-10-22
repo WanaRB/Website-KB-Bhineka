@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createSupabaseServerClient } from '../../../lib/supabase/server';
+import { createSupabaseServerClient, tambahCookie, cookieHariBaru } from '../../../lib/supabase/server';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -18,6 +18,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (error) {
     return res.status(401).json({ error: 'Email atau kata sandi salah' });
   }
+
+  // Catat hari login; sesi berakhir saat ganti hari
+  tambahCookie(res, cookieHariBaru());
 
   return res.status(200).json({ ok: true });
 }

@@ -108,12 +108,20 @@
 
 .row {
   display: grid;
-  grid-template-columns: 44px 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
   padding: 14px;
   border: 1px solid #CFE9F7;
   border-radius: 14px;
   background: #F8FCFF;
+}
+@container (min-width: 520px) {
+  .row {
+    grid-template-columns: 44px 1fr;
+  }
+  .rowLeft {
+    flex-direction: column;
+  }
 }
 .rowOver {
   border-color: #1673A8;
@@ -126,9 +134,9 @@
 
 .rowLeft {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .num {
@@ -406,9 +414,14 @@
     width: 100%;
   }
   .wrap {
-    padding: 12px;
+    padding: 8px;
+    margin-left: -6px;
+    margin-right: -6px;
   }
   .section {
-    padding: 16px;
+    padding: 14px;
+  }
+  .row {
+    padding: 12px;
   }
 }

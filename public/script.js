@@ -513,6 +513,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
         data.forEach(function (item) {
           var detail = document.createElement('details');
           detail.className = 'faq-item';
+          detail.open = true; // default terbuka, bisa ditutup pengguna
           var tanya = document.createElement('summary');
           tanya.textContent = item.pertanyaan;
           var jawab = document.createElement('p');

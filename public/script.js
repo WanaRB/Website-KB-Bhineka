@@ -71,7 +71,7 @@ const PLACEHOLDER = 'img/placeholder.svg';
     showLoadError('kegiatan-grid', msg);
     showLoadError('galeri-grid', msg);
     showLoadError('guru-grid', msg);
-    showLoadError('testimoni-list', msg);
+    showLoadError('faq-list', msg);
     var phoneLinkEl = document.getElementById('phone-link');
     if (phoneLinkEl) {
       phoneLinkEl.textContent = '📞 Nomor belum tersedia';
@@ -82,17 +82,26 @@ const PLACEHOLDER = 'img/placeholder.svg';
   // ---------- Ambil data sekolah dari Supabase ----------
   fetch('/api/public-config')
     .then(function (r) { return r.json(); })
-    .then(function (config) {
+        .then(function (config) {
       if (!config.supabaseUrl || !config.supabaseAnonKey) {
         showConfigMissing();
         return;
       }
-      loadGaleri(config);
-      loadKegiatan(config);
-      loadTestimoni(config);
-      loadPengaturan(config);
-      loadGuru(config);
-      initZoomFoto();
+      var tugas = [
+        ['loadGaleri', loadGaleri],
+        ['loadKegiatan', loadKegiatan],
+        ['loadPengaturan', loadPengaturan],
+        ['loadGuru', loadGuru],
+        ['initZoomFoto', initZoomFoto],
+        ['loadFaq', loadFaq],
+      ];
+      tugas.forEach(function (t) {
+        try {
+          t[1](config);
+        } catch (err) {
+          console.error('Gagal menjalankan ' + t[0] + ':', err);
+        }
+      });
     })
     .catch(function () {
       showConfigMissing();
@@ -485,34 +494,36 @@ const PLACEHOLDER = 'img/placeholder.svg';
     if (el) el.setAttribute(attr, value);
   }
 
-  function loadTestimoni(config) {
-    supaFetch(config, 'testimoni', 'select=nama_ortu,isi&order=created_at.desc&limit=6')
+    function loadFaq(config) {
+    supaFetch(config, 'faq', 'select=pertanyaan,jawaban&order=created_at.asc')
       .then(function (data) {
-        var list = document.getElementById('testimoni-list');
+        var list = document.getElementById('faq-list');
+        var section = document.getElementById('faq');
         if (!list) return;
         if (!Array.isArray(data)) {
-          showLoadError('testimoni-list', 'Testimoni belum bisa ditampilkan saat ini.');
+          showLoadError('faq-list', 'Pertanyaan belum bisa ditampilkan saat ini. Silakan hubungi kami lewat WhatsApp.');
           return;
         }
         if (data.length === 0) {
-          showEmpty('testimoni-list', 'Belum ada testimoni.');
+          // Belum ada pertanyaan: sembunyikan seluruh bagian
+          if (section) section.hidden = true;
           return;
         }
         list.innerHTML = '';
         data.forEach(function (item) {
-          var card = document.createElement('blockquote');
-          card.className = 'testimoni-card';
-          var p = document.createElement('p');
-          p.textContent = '"' + item.isi + '"';
-          var cite = document.createElement('cite');
-          cite.textContent = '— ' + item.nama_ortu + ', orang tua murid';
-          card.appendChild(p);
-          card.appendChild(cite);
-          list.appendChild(card);
+          var detail = document.createElement('details');
+          detail.className = 'faq-item';
+          var tanya = document.createElement('summary');
+          tanya.textContent = item.pertanyaan;
+          var jawab = document.createElement('p');
+          jawab.textContent = item.jawaban;
+          detail.appendChild(tanya);
+          detail.appendChild(jawab);
+          list.appendChild(detail);
         });
       })
       .catch(function () {
-        showLoadError('testimoni-list', 'Testimoni belum bisa ditampilkan saat ini.');
+        showLoadError('faq-list', 'Pertanyaan belum bisa ditampilkan saat ini. Silakan hubungi kami lewat WhatsApp.');
       });
   }
 })();

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { createClient } from '../../lib/supabase/client';
+import { useDialog } from '../../components/DialogProvider';
 
 type Galeri = { id: string; judul: string; url_foto: string; berita_id: string | null };
 
@@ -15,6 +16,8 @@ async function uploadFoto(file: File): Promise<string> {
 }
 
 export default function GaleriPage() {
+  const { konfirmasi, toast } = useDialog();
+
   const [items, setItems] = useState<Galeri[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Galeri | null>(null);
@@ -63,23 +66,23 @@ export default function GaleriPage() {
   }
 
   async function handleFile(file: File | undefined) {
-  if (!file) return;
-  setError('');
-  setUploading(true);
-  try {
-    const url = await uploadFoto(file);
-    setUrlFoto(url);
-  } catch (err: any) {
-    setError('Gagal mengunggah foto: ' + (err.message || 'coba lagi'));
-  } finally {
-    setUploading(false);
+    if (!file) return;
+    setError('');
+    setUploading(true);
+    try {
+      const url = await uploadFoto(file);
+      setUrlFoto(url);
+    } catch (err: any) {
+      setError('Gagal mengunggah foto: ' + (err.message || 'coba lagi'));
+    } finally {
+      setUploading(false);
+    }
   }
-}
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!judul || !urlFoto) {
-      setError('Judul dan URL foto wajib diisi');
+      setError('Judul dan foto wajib diisi');
       return;
     }
     const method = editing ? 'PUT' : 'POST';
@@ -94,14 +97,26 @@ export default function GaleriPage() {
       setError(body.error || 'Gagal menyimpan');
       return;
     }
+    toast(editing ? 'Foto sudah diperbarui' : 'Foto sudah ditambahkan');
     setShowForm(false);
     load();
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Hapus foto ini?')) return;
-    await fetch(`/api/galeri/${id}`, { method: 'DELETE' });
-    load();
+  async function handleDelete(item: Galeri) {
+    const ya = await konfirmasi({
+      judul: 'Hapus foto ini?',
+      nama: item.judul,
+      tombolYa: 'Ya, hapus',
+    });
+    if (!ya) return;
+
+    const res = await fetch(`/api/galeri/${item.id}`, { method: 'DELETE' });
+    if (res.ok) {
+      toast('Foto sudah dihapus');
+      load();
+    } else {
+      toast('Gagal menghapus. Coba lagi.', 'galat');
+    }
   }
 
   return (
@@ -117,11 +132,18 @@ export default function GaleriPage() {
           <label htmlFor="judul">Judul foto</label>
           <input id="judul" value={judul} onChange={(e) => setJudul(e.target.value)} required />
 
-          <label htmlFor="url_foto">URL foto</label>
           <label htmlFor="foto_file">Foto</label>
           <div
             className="dropzone"
+            role="button"
+            tabIndex={0}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -148,7 +170,7 @@ export default function GaleriPage() {
           {error && <p className="form-error">{error}</p>}
 
           <div className="form-actions">
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary" disabled={uploading}>
               Simpan
             </button>
             <button type="button" className="btn-secondary" onClick={() => setShowForm(false)}>
@@ -158,24 +180,26 @@ export default function GaleriPage() {
         </form>
       )}
 
-        {!showForm && (
-          <div className="data-list">
-            {items.map((item) => (
-              <div className="data-row" key={item.id}>
-                {item.url_foto && <img src={item.url_foto} alt={item.judul} className="thumb" />}
-                <span className="data-title">{item.judul}</span>
-                <div className="row-actions">
-                  <button type="button" onClick={() => openEdit(item)}>
-                    Ubah
-                  </button>
-                  <button type="button" onClick={() => handleDelete(item.id)} className="btn-danger">
-                    Hapus
-                  </button>
-                </div>
+      {!showForm && (
+        <div className="data-list">
+          {items.map((item) => (
+            <div className="data-row" key={item.id}>
+              {item.url_foto && <img src={item.url_foto} alt={item.judul} className="thumb" />}
+              <span className="data-title">{item.judul}</span>
+              <div className="row-actions">
+                <button type="button" onClick={() => openEdit(item)}>
+                  Ubah
+                </button>
+                <button type="button" onClick={() => handleDelete(item)} className="btn-danger">
+                  Hapus
+                </button>
               </div>
-            ))}
-            {items.length === 0 && <p className="empty-state">Belum ada foto. Klik &quot;Tambah foto&quot; untuk mulai.</p>}
-          </div>
+            </div>
+          ))}
+          {items.length === 0 && (
+            <p className="empty-state">Belum ada foto. Klik &quot;Tambah foto&quot; untuk mulai.</p>
+          )}
+        </div>
       )}
     </AdminLayout>
   );

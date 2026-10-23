@@ -106,67 +106,75 @@
   gap: 12px;
 }
 
-.row {
+.wrap .row {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: 32px minmax(0, 1fr) 44px;
+  grid-template-rows: auto;
+  column-gap: 12px;
+  align-items: start;
   padding: 14px;
   border: 1px solid #CFE9F7;
   border-radius: 14px;
   background: #F8FCFF;
 }
-@container (min-width: 520px) {
-  .row {
-    grid-template-columns: 44px 1fr;
-  }
-  .rowLeft {
-    flex-direction: column;
-  }
-}
-.rowOver {
+.wrap .rowOver {
   border-color: #1673A8;
   background: #EAF7FE;
   box-shadow: 0 0 0 3px #8FD3F4;
 }
-.rowDragging {
+.wrap .rowDragging {
   opacity: 0.45;
 }
 
-.rowLeft {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.num {
+.wrap .num {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  box-sizing: border-box;
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
   border-radius: 50%;
   background: #1673A8;
   color: #fff;
   font-weight: 800;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.grip {
-  width: 40px;
-  height: 40px;
+.wrap .rowBody {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.wrap .grip {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #CFE9F7;
   background: #fff;
   color: #1673A8;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.grip:active {
+.wrap .grip:active {
   cursor: grabbing;
+  background: #EAF7FE;
 }
-
 .rowBody {
   display: flex;
   flex-direction: column;
@@ -272,10 +280,17 @@
 .wrap .btnDelete {
   margin-left: auto;
   border: 2px solid #F3B8B8;
+  background: #fff;
   color: #B42318;
 }
 .wrap .btnDelete:hover {
   background: #FEF3F2;
+  border-color: #E8928C;
+  color: #B42318;
+}
+.wrap .btnDelete:focus-visible {
+  outline: 3px solid #F3B8B8;
+  outline-offset: 2px;
 }
 
 .wrap .addBtn {
@@ -423,5 +438,22 @@
   }
   .row {
     padding: 12px;
+  }
+
+    .row {
+    grid-template-columns: 28px minmax(0, 1fr) 40px;
+    gap: 8px;
+    padding: 10px;
+  }
+  .num {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 14px;
+  }
+  .grip {
+    width: 40px;
+    height: 40px;
   }
 }

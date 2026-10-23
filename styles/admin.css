@@ -405,3 +405,177 @@ img { max-width: 100%; }
   .admin-main h1 { font-size: 26px; }
   .admin-form { padding: 14px; }
 }
+
+/* ===== Dialog & notifikasi ===== */
+.dlg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(11, 58, 90, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: dlg-fade 0.15s ease-out;
+}
+
+.dlg {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px 22px 22px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(11, 58, 90, 0.35);
+  font-family: 'Nunito', system-ui, sans-serif;
+  animation: dlg-masuk 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.dlg-ikon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dlg-bahaya .dlg-ikon { background: #FFE9E5; color: #C2392B; }
+.dlg-info   .dlg-ikon { background: #EAF7FE; color: #1673A8; }
+.dlg-sukses .dlg-ikon { background: #E3F6EA; color: #0F8040; }
+
+.dlg .dlg-judul {
+  margin: 0 0 8px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 1.4rem;
+  line-height: 1.25;
+  color: #0B3A5A;
+}
+
+.dlg-pesan {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #355B73;
+}
+
+.dlg-nama {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  background: #EAF7FE;
+  border-radius: 12px;
+  font-weight: 800;
+  color: #0B3A5A;
+  word-break: break-word;
+}
+
+.dlg-aksi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.dlg-btn {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  font: 800 1.05rem 'Nunito', system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.dlg-btn:active { transform: scale(0.98); }
+.dlg-btn:focus-visible { outline: 3px solid #FFC83D; outline-offset: 2px; }
+
+.dlg-btn-batal { background: #fff; color: #0B3A5A; border-color: #B9DCEF; }
+.dlg-btn-batal:hover { background: #EAF7FE; }
+
+.dlg-btn-bahaya {
+  background: #fff;
+  color: #B42318;
+  border-color: #F3B8B8;
+}
+.dlg-btn-bahaya:hover {
+  background: #FEF3F2;
+  border-color: #E8928C;
+  color: #B42318;
+}
+.dlg-btn-bahaya:focus-visible {
+  outline: 3px solid #F3B8B8;
+  outline-offset: 2px;
+}
+
+.dlg-btn-utama { background: #1673A8; color: #fff; }
+.dlg-btn-utama:hover { background: #115E8A; }
+
+@media (min-width: 480px) {
+  .dlg-aksi { flex-direction: row; }
+  .dlg-aksi .dlg-btn { flex: 1; }
+}
+
+/* Notifikasi kecil di bawah layar */
+.toast-wadah {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+  padding: 12px 18px;
+  background: #0B3A5A;
+  color: #fff;
+  border-radius: 999px;
+  font: 700 1rem 'Nunito', system-ui, sans-serif;
+  box-shadow: 0 10px 28px rgba(11, 58, 90, 0.3);
+  animation: dlg-naik 0.25s ease-out;
+}
+.toast-titik { width: 10px; height: 10px; border-radius: 50%; flex: none; background: #8FD3F4; }
+.toast-sukses .toast-titik { background: #5BE08F; }
+.toast-galat { background: #8E2A20; }
+.toast-galat .toast-titik { background: #FFC83D; }
+
+@keyframes dlg-fade  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dlg-masuk { from { opacity: 0; transform: translateY(12px) scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes dlg-naik  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dlg-overlay, .dlg, .toast { animation: none; }
+  .dlg-btn { transition: none; }
+}
+
+/* ===== Tombol Hapus: gaya sama seperti Ubah, warna merah lembut ===== */
+button.btn-danger,
+.data-row .row-actions button.btn-danger {
+  background: #fff;
+  border-color: #F3B8B8;
+  color: #B42318;
+}
+button.btn-danger:hover,
+.data-row .row-actions button.btn-danger:hover {
+  background: #FEF3F2;
+  border-color: #E8928C;
+  color: #B42318;
+}
+button.btn-danger:focus-visible,
+.data-row .row-actions button.btn-danger:focus-visible {
+  outline: 3px solid #F3B8B8;
+  outline-offset: 2px;
+}

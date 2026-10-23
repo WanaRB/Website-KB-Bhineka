@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import '../styles/admin.css';
+import { DialogProvider } from '../components/DialogProvider';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -15,7 +16,10 @@ export default function App({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
-      <Component {...pageProps} />
+      
+      <DialogProvider>
+        <Component {...pageProps} />
+      </DialogProvider>
     </>
   );
 }

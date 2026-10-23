@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { createClient } from '../../lib/supabase/client';
+import { useDialog } from '../../components/DialogProvider';
 
 type Berita = { id: string; judul: string; isi: string; foto_url: string | null };
 
@@ -25,6 +26,8 @@ export default function BeritaPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState('');
+  const { konfirmasi, toast } = useDialog();
+
 
   async function load() {
     setLoadError('');
@@ -101,11 +104,22 @@ export default function BeritaPage() {
     load();
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Hapus berita ini?')) return;
-    await fetch(`/api/berita/${id}`, { method: 'DELETE' });
-    load();
+  async function handleDelete(item: { id: string; judul?: string }) {
+  const ya = await konfirmasi({
+    judul: 'Hapus berita ini?',
+    nama: item.judul,
+    tombolYa: 'Ya, hapus',
+  });
+  if (!ya) return;
+
+  const res = await fetch(`/api/berita/${item.id}`, { method: 'DELETE' });
+  if (res.ok) {
+    toast('Berita sudah dihapus');
+    load(); // ganti dengan nama fungsi muat-ulang daftar yang sudah ada di halaman ini
+  } else {
+    toast('Gagal menghapus. Coba lagi.', 'galat');
   }
+}
 
   return (
     <AdminLayout title="Kelola berita Acara">
@@ -148,26 +162,26 @@ export default function BeritaPage() {
       )}
 
       {!showForm && (
-        <div className="data-list">
-          {items.map((item) => (
-            <div className="data-row" key={item.id}>
-              {item.foto_url && <img src={item.foto_url} alt={item.judul} className="thumb" />}
-              <div style={{ flex: 1 }}>
-                <div className="data-title">{item.judul}</div>
-              </div>
-              <div className="row-actions">
-                <button type="button" onClick={() => openEdit(item)}>
-                  Ubah
-                </button>
-                <button type="button" onClick={() => handleDelete(item.id)} className="btn-danger">
-                  Hapus
-                </button>
-              </div>
-            </div>
-          ))}
-          {items.length === 0 && <p className="empty-state">Belum ada berita. Klik &quot;Tambah berita&quot; untuk mulai.</p>}
+  <div className="data-list">
+    {items.map((item) => (
+      <div className="data-row" key={item.id}>
+        {item.foto_url && <img src={item.foto_url} alt={item.judul} className="thumb" />}
+        <div style={{ flex: 1 }}>
+          <div className="data-title">{item.judul}</div>
         </div>
-      )}
+        <div className="row-actions">
+          <button type="button" onClick={() => openEdit(item)}>
+            Ubah
+          </button>
+          <button type="button" onClick={() => handleDelete(item)} className="btn-danger">
+            Hapus
+          </button>
+        </div>
+      </div>
+    ))}
+    {items.length === 0 && <p className="empty-state">Belum ada berita. Klik &quot;Tambah berita&quot; untuk mulai.</p>}
+  </div>
+)}
     </AdminLayout>
   );
 }

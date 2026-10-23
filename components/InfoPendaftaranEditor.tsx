@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import styles from './InfoPendaftaranEditor.module.css';
+import { useDialog } from './DialogProvider';
 
 export type Kategori = 'jadwal' | 'dokumen' | 'kelompok' | 'lainnya';
 export type InfoRow = { id: string; judul: string; isi: string; kategori: Kategori };
@@ -184,17 +185,10 @@ type Props = {
 };
 
 export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
-  const [undo, setUndo] = useState<{ row: InfoRow; index: number } | null>(null);
+  const { konfirmasi } = useDialog();
   const [drag, setDrag] = useState<{ kat: Kategori; from: number } | null>(null);
   const [over, setOver] = useState<{ kat: Kategori; index: number } | null>(null);
-  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fokusId = useRef<string | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (undoTimer.current) clearTimeout(undoTimer.current);
-    };
-  }, []);
 
   useEffect(() => {
     if (fokusId.current) {
@@ -234,23 +228,20 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
     simpanDaftar(kat, list);
   }
 
-  function hapus(kat: Kategori, index: number) {
-    const list = [...daftar(kat)];
-    const [row] = list.splice(index, 1);
+  function hapus(sec: SectionDef, index: number) {
+    const list = [...daftar(sec.kat)];
+    const row = list[index];
     if (!row) return;
-    simpanDaftar(kat, list);
-    setUndo({ row, index });
-    if (undoTimer.current) clearTimeout(undoTimer.current);
-    undoTimer.current = setTimeout(() => setUndo(null), 7000);
-  }
 
-  function urungkan() {
-    if (!undo) return;
-    const list = [...daftar(undo.row.kategori)];
-    list.splice(Math.min(undo.index, list.length), 0, undo.row);
-    simpanDaftar(undo.row.kategori, list);
-    setUndo(null);
-    if (undoTimer.current) clearTimeout(undoTimer.current);
+    konfirmasi({
+      judul: 'Hapus dari "' + sec.title + '"?',
+      nama: row.judul || row.isi || 'Baris ' + (index + 1),
+      tombolYa: 'Ya, hapus',
+    }).then((ya) => {
+      if (!ya) return;
+      const terbaru = daftar(sec.kat).filter((r) => r.id !== row.id);
+      simpanDaftar(sec.kat, terbaru);
+    });
   }
 
   return (
@@ -266,9 +257,6 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
           <h2 className={styles.topTitle}>Informasi Pendaftaran</h2>
           <p className={styles.topDesc}>Isi tiap bagian di bawah. Perubahan tampil di website setelah disimpan.</p>
         </div>
-        <a className={styles.previewLink} href="/#info" target="_blank" rel="noopener noreferrer">
-          Lihat tampilan orang tua ↗
-        </a>
       </div>
 
       {SECTIONS.map((sec) => {
@@ -284,7 +272,7 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
             {list.length === 0 ? (
               <p className={styles.empty}>{sec.empty}</p>
             ) : (
-              <ol className={styles.list}>
+                            <ol className={styles.list}>
                 {list.map((row, i) => {
                   const sedangOver = drag && over && over.kat === sec.kat && over.index === i;
                   const sedangDrag = drag && drag.kat === sec.kat && drag.from === i;
@@ -310,27 +298,7 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
                         setOver(null);
                       }}
                     >
-                      <div className={styles.rowLeft}>
-                        <span className={styles.num}>{i + 1}</span>
-                        <span
-                          className={styles.grip}
-                          draggable
-                          title="Tahan dan seret untuk mengubah urutan"
-                          onDragStart={(e) => {
-                            setDrag({ kat: sec.kat, from: i });
-                            e.dataTransfer.effectAllowed = 'move';
-                            e.dataTransfer.setData('text/plain', row.id);
-                            const li = e.currentTarget.closest('li');
-                            if (li) e.dataTransfer.setDragImage(li, 20, 20);
-                          }}
-                          onDragEnd={() => {
-                            setDrag(null);
-                            setOver(null);
-                          }}
-                        >
-                          <IconGrip />
-                        </span>
-                      </div>
+                      <span className={styles.num}>{i + 1}</span>
 
                       <div className={styles.rowBody}>
                         <div className={sec.fields.length === 2 ? styles.fieldsTwo : styles.fields}>
@@ -365,26 +333,35 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
                         </div>
 
                         <div className={styles.actions}>
-                          {i > 0 && (
-                            <button type="button" className={styles.btnMove} onClick={() => pindah(sec.kat, i, i - 1)}>
-                              <IconUp /> Naik
-                            </button>
-                          )}
-                          {i < list.length - 1 && (
-                            <button type="button" className={styles.btnMove} onClick={() => pindah(sec.kat, i, i + 1)}>
-                              <IconDown /> Turun
-                            </button>
-                          )}
                           <button
                             type="button"
                             className={styles.btnDelete}
-                            onClick={() => hapus(sec.kat, i)}
+                            onClick={() => hapus(sec, i)}
                             aria-label={'Hapus baris ' + (i + 1) + ' dari ' + sec.title}
                           >
                             <IconTrash /> Hapus
                           </button>
                         </div>
                       </div>
+
+                      <span
+                        className={styles.grip}
+                        draggable
+                        title="Tahan dan seret untuk mengubah urutan"
+                        onDragStart={(e) => {
+                          setDrag({ kat: sec.kat, from: i });
+                          e.dataTransfer.effectAllowed = 'move';
+                          e.dataTransfer.setData('text/plain', row.id);
+                          const li = e.currentTarget.closest('li');
+                          if (li) e.dataTransfer.setDragImage(li, 20, 20);
+                        }}
+                        onDragEnd={() => {
+                          setDrag(null);
+                          setOver(null);
+                        }}
+                      >
+                        <IconGrip />
+                      </span>
                     </li>
                   );
                 })}
@@ -398,14 +375,6 @@ export default function InfoPendaftaranEditor({ rows, onChange }: Props) {
         );
       })}
 
-      {undo && (
-        <div className={styles.undoBar} role="status">
-          <span>Baris dihapus.</span>
-          <button type="button" onClick={urungkan}>
-            Urungkan
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -249,18 +249,61 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 .guru-card h3 { font-size: 18px; margin: 0 0 2px; color: var(--teks); font-weight: 700; }
 .guru-card p { font-size: 16px; color: var(--teks-lembut); margin: 0; }
 
-/* ---------- Testimoni ---------- */
-.testimoni-list { display: flex; flex-direction: column; gap: 14px; }
-.testimoni-card {
+/* ---------- Pertanyaan yang Sering Diajukan ---------- */
+.section[hidden] { display: none; }
+.faq-list { display: flex; flex-direction: column; gap: 12px; }
+.faq-item {
   background: #fff;
-  border-left: 6px solid var(--koral);
+  border-left: 6px solid var(--kuning);
   border-radius: 16px;
-  padding: 16px 18px;
-  margin: 0;
   box-shadow: var(--bayang);
+  overflow: hidden;
 }
-.testimoni-card p { margin: 0 0 8px; font-size: 17px; }
-.testimoni-card cite { font-style: normal; color: var(--teks-lembut); font-size: 16px; }
+.faq-item summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 14px 56px 14px 18px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--teks);
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--biru-pucat);
+  color: var(--biru-tua);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.faq-item[open] summary::after { content: '−'; }
+.faq-item summary:focus-visible { outline: 3px solid var(--biru-tua); outline-offset: -3px; }
+.faq-item p {
+  margin: 0;
+  padding: 0 18px 16px;
+  font-size: 17px;
+  white-space: pre-line;
+}
+.faq-catatan {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 16px;
+  color: var(--teks-lembut);
+}
 
 /* ---------- Lokasi & Kontak ---------- */
 .alamat { font-size: 17px; margin: 0; }

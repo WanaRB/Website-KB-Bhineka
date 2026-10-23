@@ -7,7 +7,7 @@ const links = [
   { href: '/admin/dashboard', label: 'Dashboard' },
   { href: '/admin/galeri', label: 'Galeri' },
   { href: '/admin/berita', label: 'Berita & Kegiatan' },
-  { href: '/admin/testimoni', label: 'Testimoni' },
+  { href: '/admin/faq', label: 'Pertanyaan Umum (FAQ)' },
   { href: '/admin/guru', label: 'Guru & Staff' },
   { href: '/admin/pengaturan', label: 'Pengaturan Website' },
 ];

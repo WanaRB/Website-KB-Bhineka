@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
+import { hapusFoto } from '../../../lib/storage';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createSupabaseServerClient(req, res);
@@ -24,8 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'DELETE') {
+    const { data: lama } = await supabase.from('guru_staff').select('foto_url').eq('id', id).single();
     const { error } = await supabase.from('guru_staff').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
+    await hapusFoto(supabase, lama?.foto_url);
     return res.status(204).end();
   }
 

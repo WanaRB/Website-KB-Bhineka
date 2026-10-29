@@ -1,17 +1,12 @@
 -- ============================================================
 -- Skema database KB Bhineka Tunggal Ika
--- Jalankan di Supabase Dashboard > SQL Editor > New query
---
--- Catatan: jika sebelumnya sudah pernah menjalankan versi skema yang
--- memiliki kolom "jadwal" pada berita_kegiatan, jalankan dulu:
---   alter table public.berita_kegiatan drop column if exists jadwal;
--- Jika tabel berita_kegiatan sudah ada tapi belum punya kolom foto_url:
---   alter table public.berita_kegiatan add column if not exists foto_url text;
+-- Untuk instalasi BARU. Jalankan di Supabase > SQL Editor > New query.
+-- Jangan dijalankan ulang di database yang sudah berisi data.
 -- ============================================================
 
 create extension if not exists "pgcrypto";
 
--- ---------- Tabel users (profil admin, terhubung ke Supabase Auth) ----------
+-- ---------- users (profil admin, terhubung ke Supabase Auth) ----------
 create table public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   nama text not null,
@@ -19,7 +14,7 @@ create table public.users (
   created_at timestamptz not null default now()
 );
 
--- ---------- Tabel berita_kegiatan ----------
+-- ---------- berita_kegiatan ----------
 create table public.berita_kegiatan (
   id uuid primary key default gen_random_uuid(),
   judul text not null,
@@ -31,7 +26,7 @@ create table public.berita_kegiatan (
   updated_at timestamptz not null default now()
 );
 
--- ---------- Tabel galeri (opsional terhubung ke berita_kegiatan) ----------
+-- ---------- galeri (boleh terhubung ke berita) ----------
 create table public.galeri (
   id uuid primary key default gen_random_uuid(),
   judul text not null,
@@ -41,17 +36,7 @@ create table public.galeri (
   created_at timestamptz not null default now()
 );
 
--- ---------- Tabel testimoni ----------
-create table public.testimoni (
-  id uuid primary key default gen_random_uuid(),
-  nama_ortu text not null,
-  isi text not null,
-  rating int check (rating between 1 and 5) default 5,
-  created_by uuid references public.users(id) on delete set null,
-  created_at timestamptz not null default now()
-);
-
--- ---------- Tabel guru_staff ----------
+-- ---------- guru_staff ----------
 create table public.guru_staff (
   id uuid primary key default gen_random_uuid(),
   nama text not null,
@@ -62,9 +47,17 @@ create table public.guru_staff (
   created_at timestamptz not null default now()
 );
 
--- ---------- Tabel pengaturan (konten statis halaman orang tua) ----------
--- Menyimpan konten yang sebelumnya hardcode di kode: tagline, foto hero,
--- alamat, nomor telepon/WA, usia murid, biaya, visi & misi.
+-- ---------- faq (pertanyaan yang sering diajukan) ----------
+create table public.faq (
+  id uuid primary key default gen_random_uuid(),
+  pertanyaan text not null,
+  jawaban text not null,
+  created_at timestamptz not null default now()
+);
+
+-- ---------- pengaturan (isi halaman orang tua, pasangan key-value) ----------
+-- Kunci yang dipakai: tagline, foto_hero_url, foto_profil_url, tentang_teks,
+-- info_pendaftaran (JSON), alamat, no_telp, maps_koordinat, jam_operasional, wa_pesan
 create table public.pengaturan (
   key text primary key,
   value text,
@@ -74,14 +67,8 @@ create table public.pengaturan (
 
 insert into public.pengaturan (key, value) values
   ('tagline', 'Tempat anak belajar sambil bermain, dengan penuh kasih sayang'),
-  ('foto_hero_url', 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1200&auto=format&fit=crop'),
   ('alamat', 'Jl. Contoh Alamat No. 123, Desa Contoh, Kecamatan Contoh, Kabupaten Contoh'),
-  ('no_telp', '6281234567890'),
-  ('usia', '2 - 4 tahun'),
-  ('biaya', 'Hubungi kami'),
-  ('visi_misi', 'Anak tumbuh percaya diri dan mandiri
-Belajar berbagi dan bekerja sama dengan teman
-Suasana belajar yang hangat, aman, dan menyenangkan')
+  ('no_telp', '6281234567890')
 on conflict (key) do nothing;
 
 -- ============================================================
@@ -90,35 +77,59 @@ on conflict (key) do nothing;
 alter table public.users enable row level security;
 alter table public.berita_kegiatan enable row level security;
 alter table public.galeri enable row level security;
-alter table public.testimoni enable row level security;
 alter table public.guru_staff enable row level security;
+alter table public.faq enable row level security;
 alter table public.pengaturan enable row level security;
 
--- Halaman orang tua (anon key) hanya boleh membaca
+-- Halaman orang tua (anon key): hanya boleh membaca
 create policy "Publik baca berita" on public.berita_kegiatan for select using (true);
 create policy "Publik baca galeri" on public.galeri for select using (true);
-create policy "Publik baca testimoni" on public.testimoni for select using (true);
 create policy "Publik baca guru staff" on public.guru_staff for select using (true);
 create policy "Publik baca pengaturan" on public.pengaturan for select using (true);
+create policy "faq_baca_publik" on public.faq for select to anon, authenticated using (true);
 
--- Admin yang login boleh membaca profil sendiri
+-- Admin boleh membaca profil sendiri
 create policy "Admin baca profil sendiri" on public.users for select using (auth.uid() = id);
 
--- Admin yang sudah login (authenticated) boleh kelola semua konten
+-- Admin yang login (authenticated) boleh kelola semua konten
 create policy "Admin kelola berita" on public.berita_kegiatan
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "Admin kelola galeri" on public.galeri
-  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "Admin kelola testimoni" on public.testimoni
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "Admin kelola guru staff" on public.guru_staff
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "Admin kelola pengaturan" on public.pengaturan
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "faq_kelola_admin" on public.faq
+  for all to authenticated using (true) with check (true);
 
 -- ============================================================
--- Trigger: otomatis buat baris public.users saat akun admin baru dibuat
--- (buat akun admin lewat Supabase Dashboard > Authentication > Add user)
+-- Hak akses tabel
+-- ============================================================
+grant usage on schema public to anon, authenticated;
+grant select on public.berita_kegiatan, public.galeri, public.guru_staff,
+                public.faq, public.pengaturan to anon;
+grant select, insert, update, delete on public.berita_kegiatan, public.galeri,
+                public.guru_staff, public.faq, public.pengaturan to authenticated;
+grant select on public.users to authenticated;
+
+-- ============================================================
+-- Storage: bucket foto "galeri" (baca publik, unggah/hapus oleh admin)
+-- ============================================================
+insert into storage.buckets (id, name, public)
+values ('galeri', 'galeri', true)
+on conflict (id) do nothing;
+
+create policy "galeri_baca_publik" on storage.objects
+  for select using (bucket_id = 'galeri');
+create policy "galeri_unggah_admin" on storage.objects
+  for insert to authenticated with check (bucket_id = 'galeri');
+create policy "galeri_hapus_admin" on storage.objects
+  for delete to authenticated using (bucket_id = 'galeri');
+
+-- ============================================================
+-- Trigger: buat baris public.users otomatis saat akun admin dibuat
+-- (buat akun lewat Supabase > Authentication > Add user)
 -- ============================================================
 create or replace function public.handle_new_user()
 returns trigger as $$

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
+import { hapusFoto } from '../../../lib/storage';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createSupabaseServerClient(req, res);
@@ -24,8 +25,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'DELETE') {
+    // Ambil alamat foto dulu agar berkasnya bisa dihapus dari Storage
+    const { data: lama } = await supabase.from('galeri').select('url_foto').eq('id', id).single();
     const { error } = await supabase.from('galeri').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
+    await hapusFoto(supabase, lama?.url_foto);
     return res.status(204).end();
   }
 

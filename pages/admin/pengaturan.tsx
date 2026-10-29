@@ -18,7 +18,6 @@ type Settings = {
   maps_koordinat: string;
   no_telp: string;
   jam_operasional: string;
-  cta_teks: string;
   wa_pesan: string;
 };
 
@@ -32,7 +31,6 @@ const EMPTY: Settings = {
   maps_koordinat: '',
   no_telp: '',
   jam_operasional: '',
-  cta_teks: '',
   wa_pesan: '',
 };
 

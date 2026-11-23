@@ -10,13 +10,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { id } = req.query;
 
   if (req.method === 'PUT') {
-    const { judul, url_foto, berita_id } = req.body || {};
-    if (!judul || !url_foto) {
-      return res.status(400).json({ error: 'Judul dan URL foto wajib diisi' });
-    }
+    const { judul, url_foto } = req.body || {};
+    if (!judul || !url_foto) return res.status(400).json({ error: 'Judul dan URL foto wajib diisi' });
     const { data, error } = await supabase
       .from('galeri')
-      .update({ judul, url_foto, berita_id: berita_id || null })
+      .update({ judul, url_foto })
       .eq('id', id)
       .select()
       .single();
@@ -25,11 +23,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'DELETE') {
-    // Ambil alamat foto dulu agar berkasnya bisa dihapus dari Storage
     const { data: lama } = await supabase.from('galeri').select('url_foto').eq('id', id).single();
     const { error } = await supabase.from('galeri').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
-    await hapusFoto(supabase, lama?.url_foto);
+    await hapusFoto(lama?.url_foto);
     return res.status(204).end();
   }
 

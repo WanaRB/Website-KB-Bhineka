@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { data, error } = await supabase
       .from('faq')
-      .insert({ pertanyaan, jawaban })
+      .insert({ pertanyaan, jawaban, created_by: session.user.id })
       .select()
       .single();
     if (error) return res.status(500).json({ error: error.message });

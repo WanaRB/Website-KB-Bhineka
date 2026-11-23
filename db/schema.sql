@@ -2,37 +2,29 @@
 -- Skema database KB Bhineka Tunggal Ika
 -- Untuk instalasi BARU. Jalankan di Supabase > SQL Editor > New query.
 -- Jangan dijalankan ulang di database yang sudah berisi data.
+-- Akun admin dibuat lewat Supabase > Authentication > Add user.
+-- Kolom created_by / updated_by merujuk langsung ke auth.users.
 -- ============================================================
 
 create extension if not exists "pgcrypto";
-
--- ---------- users (profil admin, terhubung ke Supabase Auth) ----------
-create table public.users (
-  id uuid primary key references auth.users(id) on delete cascade,
-  nama text not null,
-  email text not null unique,
-  created_at timestamptz not null default now()
-);
 
 -- ---------- berita_kegiatan ----------
 create table public.berita_kegiatan (
   id uuid primary key default gen_random_uuid(),
   judul text not null,
   isi text not null,
-  tanggal date,
   foto_url text,
-  created_by uuid references public.users(id) on delete set null,
+  created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
--- ---------- galeri (boleh terhubung ke berita) ----------
+-- ---------- galeri ----------
 create table public.galeri (
   id uuid primary key default gen_random_uuid(),
   judul text not null,
   url_foto text not null,
-  berita_id uuid references public.berita_kegiatan(id) on delete set null,
-  created_by uuid references public.users(id) on delete set null,
+  created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
 );
 
@@ -42,8 +34,7 @@ create table public.guru_staff (
   nama text not null,
   jabatan text not null,
   foto_url text,
-  bio text,
-  created_by uuid references public.users(id) on delete set null,
+  created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
 );
 
@@ -52,6 +43,7 @@ create table public.faq (
   id uuid primary key default gen_random_uuid(),
   pertanyaan text not null,
   jawaban text not null,
+  created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
 );
 
@@ -61,7 +53,7 @@ create table public.faq (
 create table public.pengaturan (
   key text primary key,
   value text,
-  updated_by uuid references public.users(id) on delete set null,
+  updated_by uuid references auth.users(id) on delete set null,
   updated_at timestamptz not null default now()
 );
 
@@ -74,7 +66,6 @@ on conflict (key) do nothing;
 -- ============================================================
 -- Row Level Security
 -- ============================================================
-alter table public.users enable row level security;
 alter table public.berita_kegiatan enable row level security;
 alter table public.galeri enable row level security;
 alter table public.guru_staff enable row level security;
@@ -87,9 +78,6 @@ create policy "Publik baca galeri" on public.galeri for select using (true);
 create policy "Publik baca guru staff" on public.guru_staff for select using (true);
 create policy "Publik baca pengaturan" on public.pengaturan for select using (true);
 create policy "faq_baca_publik" on public.faq for select to anon, authenticated using (true);
-
--- Admin boleh membaca profil sendiri
-create policy "Admin baca profil sendiri" on public.users for select using (auth.uid() = id);
 
 -- Admin yang login (authenticated) boleh kelola semua konten
 create policy "Admin kelola berita" on public.berita_kegiatan
@@ -111,35 +99,16 @@ grant select on public.berita_kegiatan, public.galeri, public.guru_staff,
                 public.faq, public.pengaturan to anon;
 grant select, insert, update, delete on public.berita_kegiatan, public.galeri,
                 public.guru_staff, public.faq, public.pengaturan to authenticated;
-grant select on public.users to authenticated;
 
 -- ============================================================
--- Storage: bucket foto "galeri" (baca publik, unggah/hapus oleh admin)
+-- Storage: bucket foto "galeri"
+-- Bucket publik: foto bisa dibuka lewat URL tanpa kebijakan SELECT.
+-- Admin hanya perlu izin unggah (INSERT). Penghapusan berkas dilakukan
+-- API server dengan SUPABASE_SERVICE_ROLE_KEY (lihat lib/storage.ts).
 -- ============================================================
 insert into storage.buckets (id, name, public)
 values ('galeri', 'galeri', true)
 on conflict (id) do nothing;
 
-create policy "galeri_baca_publik" on storage.objects
-  for select using (bucket_id = 'galeri');
 create policy "galeri_unggah_admin" on storage.objects
   for insert to authenticated with check (bucket_id = 'galeri');
-create policy "galeri_hapus_admin" on storage.objects
-  for delete to authenticated using (bucket_id = 'galeri');
-
--- ============================================================
--- Trigger: buat baris public.users otomatis saat akun admin dibuat
--- (buat akun lewat Supabase > Authentication > Add user)
--- ============================================================
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.users (id, nama, email)
-  values (new.id, coalesce(new.raw_user_meta_data->>'nama', new.email), new.email);
-  return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();

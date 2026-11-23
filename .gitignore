@@ -3,6 +3,5 @@ node_modules
 .env
 .env.local
 .vercel
-desktop.ini
 *.ini
 next-env.d.ts

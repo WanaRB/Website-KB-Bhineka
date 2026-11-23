@@ -10,13 +10,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { id } = req.query;
 
   if (req.method === 'PUT') {
-    const { nama, jabatan, foto_url, bio } = req.body || {};
+    const { nama, jabatan, foto_url } = req.body || {};
     if (!nama || !jabatan) {
       return res.status(400).json({ error: 'Nama dan jabatan wajib diisi' });
     }
     const { data, error } = await supabase
       .from('guru_staff')
-      .update({ nama, jabatan, foto_url: foto_url || null, bio: bio || null })
+      .update({ nama, jabatan, foto_url: foto_url || null })
       .eq('id', id)
       .select()
       .single();
@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: lama } = await supabase.from('guru_staff').select('foto_url').eq('id', id).single();
     const { error } = await supabase.from('guru_staff').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
-    await hapusFoto(supabase, lama?.foto_url);
+    await hapusFoto(lama?.foto_url);
     return res.status(204).end();
   }
 

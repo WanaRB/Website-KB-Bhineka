@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('galeri')
-      .select('id, judul, url_foto, berita_id, created_at')
+      .select('id, judul, url_foto, created_at')
       .order('created_at', { ascending: false });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
@@ -17,14 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return res.status(401).json({ error: 'Belum login' });
 
-    const { judul, url_foto, berita_id } = req.body || {};
+    const { judul, url_foto } = req.body || {};
     if (!judul || !url_foto) {
       return res.status(400).json({ error: 'Judul dan URL foto wajib diisi' });
     }
 
     const { data, error } = await supabase
       .from('galeri')
-      .insert({ judul, url_foto, berita_id: berita_id || null, created_by: session.user.id })
+      .insert({ judul, url_foto, created_by: session.user.id })
       .select()
       .single();
     if (error) return res.status(500).json({ error: error.message });

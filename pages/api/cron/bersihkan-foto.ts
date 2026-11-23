@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
 
 const BUCKET = 'galeri';
-const UMUR_MINIMAL_JAM = 0;
+const UMUR_MINIMAL_JAM = 24;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const rahasia = process.env.CRON_SECRET;

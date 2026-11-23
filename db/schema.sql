@@ -100,6 +100,10 @@ grant select on public.berita_kegiatan, public.galeri, public.guru_staff,
 grant select, insert, update, delete on public.berita_kegiatan, public.galeri,
                 public.guru_staff, public.faq, public.pengaturan to authenticated;
 
+-- Kunci server (dipakai cron pembersih foto): hanya baca
+grant select on public.berita_kegiatan, public.galeri, public.guru_staff,
+                public.pengaturan to service_role;
+
 -- ============================================================
 -- Storage: bucket foto "galeri"
 -- Bucket publik: foto bisa dibuka lewat URL tanpa kebijakan SELECT.

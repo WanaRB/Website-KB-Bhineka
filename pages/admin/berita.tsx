@@ -115,7 +115,7 @@ export default function BeritaPage() {
   const res = await fetch(`/api/berita/${item.id}`, { method: 'DELETE' });
   if (res.ok) {
     toast('Berita sudah dihapus');
-    load(); // ganti dengan nama fungsi muat-ulang daftar yang sudah ada di halaman ini
+    load();
   } else {
     toast('Gagal menghapus. Coba lagi.', 'galat');
   }

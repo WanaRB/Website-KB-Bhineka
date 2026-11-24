@@ -3,7 +3,7 @@ import AdminLayout from '../../components/AdminLayout';
 import { createClient } from '../../lib/supabase/client';
 import { useDialog } from '../../components/DialogProvider';
 
-type Galeri = { id: string; judul: string; url_foto: string; berita_id: string | null };
+type Galeri = { id: string; judul: string; url_foto: string;};
 
 async function uploadFoto(file: File): Promise<string> {
   const supabase = createClient();

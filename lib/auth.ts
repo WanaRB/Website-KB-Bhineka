@@ -2,7 +2,7 @@
 export const COOKIE_HARI = 'admin_hari';
 
 // Jam ganti hari (WIB). 0 = tengah malam. Isi 3 jika ingin batas pukul 03.00 pagi.
-export const JAM_GANTI_HARI = 0;
+const JAM_GANTI_HARI = 0;
 
 const WIB_MS = 7 * 60 * 60 * 1000;
 
